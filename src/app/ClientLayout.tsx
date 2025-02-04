@@ -9,7 +9,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Preloader onLoadComplete={() => setLoading(false)} />
-      <div 
+      <div
         className={`
           min-h-screen w-full
           transition-opacity duration-500 
