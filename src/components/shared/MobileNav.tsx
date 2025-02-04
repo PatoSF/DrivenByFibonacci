@@ -9,17 +9,15 @@ import {
 import { AiOutlineMenu } from 'react-icons/ai';
 import Logo from './Logo';
 import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+} from "@/components/ui/accordion";
 import { NavLinks } from '@/utils/NavLinks';
 import Link from 'next/link';
-import { ListItem } from './NavBar';
+
+
 
 const MobileNav = () => {
     return (
@@ -35,49 +33,42 @@ const MobileNav = () => {
                         {/* logo */}
                         <Logo classname="w-[45px]" image="/fibo-logo.png" href="/" />
                     </div>
-                    <div className="w-full mt-16 flex flex-col justify-center gap-3 items-center">
-                        <NavigationMenu>
-                            <NavigationMenuList>
-                                {
-                                    NavLinks.map((link, index) => (
-                                        <NavigationMenuItem key={index} className="font-nunitoSans">
-                                            {
-                                                link.subNav ? (
-                                                    <>
-                                                        <NavigationMenuTrigger>{link.name}</NavigationMenuTrigger>
-                                                        <NavigationMenuContent>
-                                                            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                                                                {link.subNav.map((subnav, i) => (
-                                                                    <ListItem
-                                                                        key={i}
-                                                                        title={subnav.name}
-                                                                        href={subnav.href}
-                                                                    >
-                                                                        {subnav.description}
-                                                                    </ListItem>
-                                                                ))}
-                                                            </ul>
-                                                        </NavigationMenuContent>
-                                                    </>
-                                                )
-                                                    : (
-                                                        <Link href={link.href} legacyBehavior passHref>
-                                                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                                                {link.name}
-                                                            </NavigationMenuLink>
-                                                        </Link>
-                                                    )
-                                            }
-                                        </NavigationMenuItem>
-                                    ))
-                                }
-                            </NavigationMenuList>
-                        </NavigationMenu>
-                        <SheetClose asChild>
-
-
-                        </SheetClose>
-                    </div>
+                    <nav className="w-full mt-8 flex flex-col gap-4 px-6">
+                        {
+                            NavLinks.map((link, index) => (
+                                <div key={index} className="w-full">
+                                    {link.subNav ? (
+                                        // Use Accordion for items with sub-navigation.
+                                        <Accordion type="single" collapsible className="w-full font-nunitoSans">
+                                            <AccordionItem value={link.name}>
+                                                <AccordionTrigger>{link.name}</AccordionTrigger>
+                                                <AccordionContent>
+                                                    <ul className="flex flex-col gap-3">
+                                                        {link.subNav.map((subItem, subIndex) => (
+                                                            <li key={subIndex}>
+                                                                <SheetClose asChild>
+                                                                    <Link href={subItem.href} className="block text-sm text-gray-600 hover:text-gray-800">
+                                                                        <span className=" font-sora">{subItem.name}</span>
+                                                                        <br />
+                                                                        <span className="text-xs font-nunitoSans">{subItem.description}</span>
+                                                                    </Link>
+                                                                </SheetClose>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        </Accordion>
+                                    ) : (
+                                        <SheetClose asChild>
+                                            <Link href={link.href} className="block font-medium text-gray-800  py-2 font-nunitoSans">
+                                                {link.name}
+                                            </Link>
+                                        </SheetClose>
+                                    )}
+                                </div>
+                            ))}
+                    </nav>
                 </main>
             </SheetContent>
         </Sheet>
