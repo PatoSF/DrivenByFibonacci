@@ -11,12 +11,12 @@ export default function Hero (){
       <section className="container mx-auto mt-28">
         <div className="mx-auto grid max-w-screen-3xl px-4 pt-32 lg:grid-cols-12 lg:gap-8">
           <div className="  lg:col-span-7">
-            <h1 className="mb-4 max-w-3xl text-4xl font-extrabold leading-none tracking-tight text-white lg:text-5xl xl:text-6xl">
+            <h1 className="mb-4 max-w-3xl text-4xl font-extrabold leading-none tracking-tight lg:text-5xl xl:text-6xl">
               Mint Your Digital Masterpiece with Ease.
               <br />
             </h1>
 
-            <p className="md:text-xllg:mb-8 mb-6 max-w-2xl font-mono font-light text-gray-500 lg:text-2xl">
+            <p className="md:text-xllg:mb-8 mb-6 max-w-2xl font-mono font-light  lg:text-2xl">
               Step into the digital realm where ownership meets creativity. With
               our platform, you can bring your unique digital assets to life as
               NFTs (Non-Fungible Tokens) with just a single click.
