@@ -1,11 +1,9 @@
 "use client";
-
-
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Spline from '@splinetool/react-spline';
 
-export default function Hero (){
+export default function Hero() {
   return (
     <>
       <section className="container mx-auto mt-28">

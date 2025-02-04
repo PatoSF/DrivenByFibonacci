@@ -10,11 +10,17 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sora: ["Sora", "serif"],
+        nunitoSans: ["Nunito Sans", "serif"],
+        inter: ["Inter", "serif"],
+      },
       colors: {
         color1: "#ffefe4",
         color2: "#191221",
         color3: "#7f316d",
         color4: "#ebded7",
+        color5: "#CC4976",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

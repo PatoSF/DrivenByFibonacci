@@ -1,25 +1,8 @@
-
-import { Sora, Nunito_Sans, Inter } from "next/font/google";
 import "@/styles/globals.css";
-import Nav from "@/components/shared/nav-bar";
+import Nav from "@/components/shared/NavBar";
 import ClientLayout from "./ClientLayout";
 import { getMetadata } from "@/utils/getMetadata";
 import MaxWrapper from "@/components/shared/MaxWrapper";
-
-export const soraFont = Sora({
-  variable: "--font-sora",
-  subsets: ["latin"],
-});
-
-export const nunitoSansFont = Nunito_Sans({
-  variable: "--font-nunito-sans",
-  subsets: ["latin"],
-});
-
-export const interFont = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata = getMetadata({
   title: "Driven By Fibonacci",
@@ -34,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`antialiased bg-[#ffefe4]`}
+        className={`antialiased bg-color1`}
       >
         {/* ClientLayout handles the spline preloader */}
         <ClientLayout>
