@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 
 export default function Nav() {
   return (
-    <header className="fixed top-0 w-full z-50  bg-opacity-30 backdrop-blur-lg backdrop-filter ">
+    <header className="fixed top-0 w-full z-50 bg-transparent  bg-opacity-30 backdrop-blur-lg backdrop-filter ">
       <nav className="container flex items-center justify-between py-6 px-4 mx-auto">
   
         <Link href="/" className="flex items-center">
