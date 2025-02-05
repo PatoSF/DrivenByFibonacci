@@ -27,7 +27,7 @@ export default function Nav() {
   });
 
   return (
-    <header className="fixed top-0 inset-x-0 w-full z-50 bg-transparent bg-opacity-30 backdrop-blur-lg backdrop-filter">
+    <header className="fixed top-0 inset-x-0 w-full z-50 bg-color1 bg-opacity-30 backdrop-blur-lg backdrop-filter">
       <motion.div
         className="fixed top-0 inset-x-0 bg-color5 origin-[0%] h-[6px] z-40"
         style={{ scaleX }}
