@@ -1,43 +1,21 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Spline from '@splinetool/react-spline';
+import { Globe } from "@/components/ui/globe";
+import { LineShadowText } from "@/components/ui/line-shadow-text";
 
 export default function Hero() {
   return (
-    <>
-      <section className="container mx-auto mt-28">
-        <div className="mx-auto grid max-w-screen-3xl px-4 pt-32 lg:grid-cols-12 lg:gap-8">
-          <div className="  lg:col-span-7">
-            <h1 className="mb-4 max-w-3xl text-4xl font-extrabold leading-none tracking-tight lg:text-5xl xl:text-6xl">
-              Mint Your Digital Masterpiece with Ease.
-              <br />
-            </h1>
-
-            <p className="md:text-xllg:mb-8 mb-6 max-w-2xl font-mono font-light  lg:text-2xl">
-              Step into the digital realm where ownership meets creativity. With
-              our platform, you can bring your unique digital assets to life as
-              NFTs (Non-Fungible Tokens) with just a single click.
-            </p>
-
-            <div className="mb-4 space-y-4 sm:flex sm:space-x-4 sm:space-y-0">
-              <Link href="/">
-                <Button
-                  variant={"default"}
-                  // className="h-12 min-w-[4rem] gap-2 rounded-xl border border-white/10 bg-primary px-4 py-3 font-bold text-foreground lg:min-w-[8rem] lg:rounded-2xl"
-                  className="h-12 min-w-[4rem] gap-2 rounded-xl border border-white/10  px-4 py-3 font-bold text-foreground lg:min-w-[8rem] lg:rounded-2xl"
-                  translate="no"
-                >
-                  Get Started
-                </Button>
-              </Link>
-            </div>
-          </div>
-          {/* <div className=" lg:col-span-5"> */}
-          <Spline className="h-full w-full lg:col-span-5" scene="https://prod.spline.design/Nw7qEXSPGkMODQVN/scene.splinecode" />
-          {/* </div> */}
+    <section className="w-full md:h-[1000px] h-[650px] flex items-center justify-center">
+      <div className="relative flex w-full h-full items-start justify-center overflow-hidden bg-color1 px-4  py-12 ">
+        <div className="lg:w-[60%] md:w-[70%] w-full flex flex-col gap-1.5 justify-center items-center lg:mt-20 mt-16">
+          <h1 className="font-inter text-balance leading-none pointer-events-none lg:text-6xl md:text-4xl text-[30px] font-bold text-color2 text-center ">Discover a New Dimension of{" "}
+            <LineShadowText className="" shadowColor={"black"}>
+              Stability
+            </LineShadowText>
+          </h1>
+          <p className="font-nunitoSans text-lg text-center pointer-events-none text-color2/80">Driven by Fibonacci turns data into steady returns, using mathematical ratios to chart a path to financial resilience and unlock new growth opportunities.</p>
         </div>
-      </section>
-    </>
+        <Globe className="lg:top-[270px] md:top-[250px] top-[280px]" />
+      </div>
+    </section>
   );
 };
