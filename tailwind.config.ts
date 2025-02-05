@@ -18,6 +18,9 @@ export default {
       backgroundSize: {
         "300": "300%",
       },
+      backgroundImage: {
+        pattern: "url('/patternpad.svg')",
+      },
       colors: {
         color1: "#ffefe4",
         color2: "#191221",
