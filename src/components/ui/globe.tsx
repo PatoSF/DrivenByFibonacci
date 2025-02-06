@@ -3,7 +3,6 @@
 
 import createGlobe, { COBEOptions } from "cobe";
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import { cn } from "@/lib/utils";
 
 const GLOBE_CONFIG: COBEOptions = {
@@ -41,13 +40,15 @@ export function Globe({
   className?: string;
   config?: COBEOptions;
 }) {
-  let phi = 0;
-  let width = 0;
+  // Use refs to preserve mutable values across renders
+  const phiRef = useRef(0);
+  const widthRef = useRef(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pointerInteracting = useRef(null);
+  const pointerInteracting = useRef<any>(null);
   const pointerInteractionMovement = useRef(0);
   const [r, setR] = useState(0);
 
+  // Preserve the initial marker sizes for pulsating effect
   const baseMarkerSizes = useRef(config.markers.map((m) => m.size));
 
   const updatePointerInteraction = (value: any) => {
@@ -68,27 +69,28 @@ export function Globe({
   const onRender = useCallback(
     (state: Record<string, any>) => {
       // Increment the base rotation (unless dragging)
-      if (pointerInteracting.current === null) phi += 0.005;
-      state.phi = phi + r;
-      state.width = width * 2;
-      state.height = width * 2;
+      if (pointerInteracting.current === null) {
+        phiRef.current += 0.005;
+      }
+      state.phi = phiRef.current + r;
+      state.width = widthRef.current * 2;
+      state.height = widthRef.current * 2;
 
       // Create a pulsating effect for each marker.
       const t = performance.now() * 0.001; // time in seconds
       config.markers.forEach((marker, i) => {
-        // Pulsate between 80% and 120% of the base size
         const baseSize = baseMarkerSizes.current[i];
         marker.size = baseSize * (1 + 0.2 * Math.sin(t + i));
       });
     },
-    [r, config.markers],
+    [r, config.markers]
   );
 
   const onResize = useCallback(() => {
     if (canvasRef.current) {
-      width = canvasRef.current.offsetWidth;
+      widthRef.current = canvasRef.current.offsetWidth;
     }
-  }, [canvasRef]);
+  }, []);
 
   useEffect(() => {
     window.addEventListener("resize", onResize);
@@ -96,30 +98,32 @@ export function Globe({
 
     const globe = createGlobe(canvasRef.current!, {
       ...config,
-      width: width * 2,
-      height: width * 2,
+      width: widthRef.current * 2,
+      height: widthRef.current * 2,
       onRender,
     });
 
-    setTimeout(() => (canvasRef.current!.style.opacity = "1"));
+    setTimeout(() => {
+      if (canvasRef.current) canvasRef.current.style.opacity = "1";
+    });
     return () => globe.destroy();
-  }, [config, onRender, width, onResize]);
+  }, [config, onRender, onResize]);
 
   return (
     <div
       className={cn(
         "absolute inset-0 mx-auto aspect-[1/1] w-full max-w-[800px]",
-        className,
+        className
       )}
     >
       <canvas
         className={cn(
-          "size-full opacity-0 transition-opacity duration-500 [contain:layout_paint_size]",
+          "size-full opacity-0 transition-opacity duration-500 [contain:layout_paint_size]"
         )}
         ref={canvasRef}
         onPointerDown={(e) =>
           updatePointerInteraction(
-            e.clientX - pointerInteractionMovement.current,
+            e.clientX - pointerInteractionMovement.current
           )
         }
         onPointerUp={() => updatePointerInteraction(null)}
