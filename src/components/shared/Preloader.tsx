@@ -5,6 +5,7 @@ import Spline from "@splinetool/react-spline";
 
 const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [fadeOutStarted, setFadeOutStarted] = useState(false);
 
   useEffect(() => {
     if (isLoading) {
@@ -13,13 +14,18 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
       document.body.style.overflow = "unset";
     }
 
-    const timer = setTimeout(() => {
+    const fadeOutTimer = setTimeout(() => {
+      setFadeOutStarted(true);
+    }, 8000);
+
+    const loadTimer = setTimeout(() => {
       setIsLoading(false);
       if (onLoadComplete) onLoadComplete();
     }, 9000);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(fadeOutTimer);
+      clearTimeout(loadTimer);
       document.body.style.overflow = "unset";
     };
   }, [isLoading, onLoadComplete]);
@@ -30,10 +36,11 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
         fixed inset-0 
         w-screen h-screen 
         z-[9999] 
-        bg-black
-        transition-opacity duration-500 
+        bg-transparent
+        transition-opacity duration-1000 
         flex items-center justify-center
         ${isLoading ? "opacity-100" : "opacity-0 pointer-events-none"}
+        ${fadeOutStarted ? "opacity-75" : "opacity-100"}
       `}
       style={{
         minHeight: "100dvh",

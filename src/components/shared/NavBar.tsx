@@ -42,12 +42,12 @@ export default function Nav() {
             <NavigationMenuList>
               {
                 NavLinks.map((link, index) => (
-                  <NavigationMenuItem key={index} className="font-nunitoSans">
-                    {
+                  <NavigationMenuItem key={index} className="font-nunitoSans bg-transparent">
+                    { 
                       link.subNav ? (
                         <>
                           <NavigationMenuTrigger>{link.name}</NavigationMenuTrigger>
-                          <NavigationMenuContent>
+                          <NavigationMenuContent className="rounded-xl">
                             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                               {link.subNav.map((subnav, i) => (
                                 <ListItem
@@ -79,7 +79,7 @@ export default function Nav() {
 
 
         <div className='flex items-center gap-[24px]'>
-          <Button className="bg-color5 transition-all duration-200 hover:bg-color2 text-white">Launch App</Button>
+          <Button className="bg-color5 rounded-lg transition-all duration-200 hover:bg-color2 text-white">Launch App</Button>
 
           <div className="lg:hidden flex items-center">
             <MobileNav />
@@ -101,7 +101,7 @@ export const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             className
           )}
           {...props}
