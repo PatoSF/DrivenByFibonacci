@@ -11,36 +11,36 @@ export const listOfFeatures = [
         title: "Mathematical Precision",
         description:
             "Harnessing Fibonacci’s golden ratios to create structured and reliable models for financial and data-driven decisions.",
-        icon: <TfiRulerAlt2 className="w-5 h-5" />,
+        icon: <TfiRulerAlt2 />,
     },
     {
         title: "Predictable Growth",
         description:
             "Aligning with nature’s most consistent patterns to ensure steady and measurable expansion over time.",
-        icon: <TbChartCovariate className="w-5 h-5" />,
+        icon: <TbChartCovariate />,
     },
     {
         title: "Dynamic Adaptability",
         description:
             "Built to adjust and respond efficiently to market fluctuations while maintaining structured progression.",
-        icon: <PiArrowsCounterClockwiseBold className="w-5 h-5" />,
+        icon: <PiArrowsCounterClockwiseBold />,
     },
     {
         title: "Harmonic Flow",
         description:
             "Ensuring smooth transitions and balance in strategic execution, inspired by Fibonacci’s natural sequences.",
-        icon: <GiWaterRecycling className="w-5 h-5" />,
+        icon: <GiWaterRecycling />,
     },
     {
         title: "Optimized Decision-Making",
         description:
             "Leveraging mathematical precision to guide intelligent choices and reduce uncertainty in complex environments.",
-        icon: <FaBrain className="w-5 h-5" />,
+        icon: <FaBrain />,
     },
     {
         title: "Strategic Symmetry",
         description:
             "A framework that balances risk and reward, ensuring equilibrium in execution and outcomes.",
-        icon: <MdBalance className="w-5 h-5" />,
+        icon: <MdBalance />,
     },
 ];
