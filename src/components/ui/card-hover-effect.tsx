@@ -49,7 +49,7 @@ export const HoverEffect = ({
             )}
           </AnimatePresence>
           <Card>
-            <div className="flex justify-start mb-4 text-white text-5xl">
+            <div className="flex justify-start mb-4 text-zinc-200 text-5xl">
               {item.icon}
             </div>
             <CardTitle>{item.title}</CardTitle>
@@ -89,7 +89,7 @@ export const CardTitle = ({
   children: React.ReactNode;
 }) => {
   return (
-    <h4 className={cn("text-zinc-100 font-bold tracking-wide mt-4", className)}>
+    <h4 className={cn("text-zinc-200 font-bold tracking-wide mt-4", className)}>
       {children}
     </h4>
   );
