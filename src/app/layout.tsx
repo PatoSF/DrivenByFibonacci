@@ -3,6 +3,7 @@ import Nav from "@/components/shared/NavBar";
 import ClientLayout from "./ClientLayout";
 import { getMetadata } from "@/utils/getMetadata";
 import MaxWrapper from "@/components/shared/MaxWrapper";
+import { Footer } from "@/components/shared/Footer";
 
 export const metadata = getMetadata({
   title: "Driven By Fibonacci",
@@ -26,6 +27,7 @@ export default function RootLayout({
             <main className="w-full">
               {children}
             </main>
+            <Footer />
           </MaxWrapper>
         </ClientLayout>
       </body>
