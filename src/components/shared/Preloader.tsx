@@ -16,7 +16,7 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
     const timer = setTimeout(() => {
       setIsLoading(false);
       if (onLoadComplete) onLoadComplete();
-    }, 13000);
+    }, 14000);
 
     return () => {
       clearTimeout(timer);

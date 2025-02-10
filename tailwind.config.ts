@@ -100,12 +100,24 @@ export default {
           "0%": { "background-position": "right" },
           "100%": { "background-position": "left" },
         },
+        shine: {
+          "0%": {
+            "background-position": "0% 0%",
+          },
+          "50%": {
+            "background-position": "100% 100%",
+          },
+          to: {
+            "background-position": "0% 0%",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "line-shadow": "line-shadow 15s linear infinite",
         "hero-text": "heroTextAnimate 5s infinite linear alternate",
+        shine: "shine var(--duration) infinite linear",
       },
     },
   },
