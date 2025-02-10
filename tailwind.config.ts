@@ -14,6 +14,7 @@ export default {
         sora: ["Sora", "serif"],
         nunitoSans: ["Nunito Sans", "serif"],
         inter: ["Inter", "serif"],
+        marcellus: ["Marcellus", "serif"],
       },
       backgroundSize: {
         "300": "300%",
