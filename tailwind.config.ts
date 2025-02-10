@@ -23,7 +23,8 @@ export default {
         pattern: "url('/patternpad.svg')",
       },
       colors: {
-        color1: "#ffefe4",
+        color0: "#ffefe4",
+        color1: "#fff9f4",
         color2: "#191221",
         color3: "#7f316d",
         color4: "#ebded7",
