@@ -1,6 +1,7 @@
 import About from "@/components/landing/About";
 import Features from "@/components/landing/Features";
 import Hero from "@/components/landing/hero";
+import HowItWorks from "@/components/landing/HowItWorks";
 import ListOfPartners from "@/components/landing/ListOfPartners";
 
 
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <ListOfPartners />
       <About />
+      <HowItWorks />
       <Features />
     </main>
   )

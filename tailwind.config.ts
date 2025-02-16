@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Config } from "tailwindcss";
 import tailwindAnimate from "tailwindcss-animate";
+const {
+  default: flattenColorPalette,
+} = require("tailwindcss/lib/util/flattenColorPalette");
 
 export default {
   darkMode: ["class"],
@@ -14,6 +18,7 @@ export default {
         sora: ["Sora", "serif"],
         nunitoSans: ["Nunito Sans", "serif"],
         inter: ["Inter", "serif"],
+        marcellus: ["Marcellus", "serif"],
       },
       backgroundSize: {
         "300": "300%",
@@ -22,7 +27,8 @@ export default {
         pattern: "url('/patternpad.svg')",
       },
       colors: {
-        color1: "#ffefe4",
+        color0: "#ffefe4",
+        color1: "#fff9f4",
         color2: "#191221",
         color3: "#7f316d",
         color4: "#ebded7",
@@ -98,14 +104,37 @@ export default {
           "0%": { "background-position": "right" },
           "100%": { "background-position": "left" },
         },
+        shine: {
+          "0%": {
+            "background-position": "0% 0%",
+          },
+          "50%": {
+            "background-position": "100% 100%",
+          },
+          to: {
+            "background-position": "0% 0%",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "line-shadow": "line-shadow 15s linear infinite",
         "hero-text": "heroTextAnimate 5s infinite linear alternate",
+        shine: "shine var(--duration) infinite linear",
       },
     },
   },
-  plugins: [tailwindAnimate],
+  plugins: [tailwindAnimate, addVariablesForColors],
 } satisfies Config;
+
+function addVariablesForColors({ addBase, theme }: any) {
+  const allColors = flattenColorPalette(theme("colors"));
+  const newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+
+  addBase({
+    ":root": newVars,
+  });
+}

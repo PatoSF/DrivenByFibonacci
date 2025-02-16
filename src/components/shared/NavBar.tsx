@@ -27,12 +27,12 @@ export default function Nav() {
   });
 
   return (
-    <header className="fixed top-0 inset-x-0 w-full z-50 bg-color1 bg-opacity-30 backdrop-blur-lg backdrop-filter">
+    <header className="fixed top-0 inset-x-0 w-full z-50 bg-color1 bg-opacity-80 backdrop-blur-lg backdrop-filter">
       <motion.div
         className="fixed top-0 inset-x-0 bg-color5 origin-[0%] h-[6px] z-40"
         style={{ scaleX }}
       />
-      <nav className="w-full flex items-center justify-between py-4 px-8">
+      <nav className="w-full flex items-center justify-between py-3 px-8">
 
         <Logo classname="w-[45px]" image="/fibo-logo.png" href="/" />
 
@@ -47,6 +47,7 @@ export default function Nav() {
                       link.subNav ? (
                         <>
                           <NavigationMenuTrigger>{link.name}</NavigationMenuTrigger>
+
                           <NavigationMenuContent className="rounded-xl">
                             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                               {link.subNav.map((subnav, i) => (

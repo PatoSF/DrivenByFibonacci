@@ -18,20 +18,20 @@ export const getMetadata = ({
   // const imageUrl = `${baseUrl}${imageRelativePath}`;
 
   return {
-    generator: "Driven By Fibonacci",
-    applicationName: "Driven By Fibonacci",
+    generator: "EulerFi",
+    applicationName: "EulerFi",
     referrer: "origin-when-cross-origin",
     keywords: [
       "stablecoins",
       "defi",
       "ethereum",
-      "driven by fibonacci",
+      "EulerFi",
       "drivenbyfibonacci",
       "stablecoin",
       "scroll",
     ],
-    creator: "Driven By Fibonacci",
-    publisher: "Driven By Fibonacci",
+    creator: "EulerFi",
+    publisher: "EulerFi",
     metadataBase: new URL(baseUrl),
     manifest: `/manifest.json`,
     alternates: {
@@ -64,11 +64,11 @@ export const getMetadata = ({
       images: [
         {
           url: "/thumbnail.png",
-          alt: "Driven By Fibonacci - Stablecoins",
+          alt: "EulerFi - Stablecoins",
         },
       ],
       type: "website",
-      siteName: "Driven By Fibonacci",
+      siteName: "EulerFi",
       locale: "en_US",
     },
     twitter: {
@@ -81,7 +81,7 @@ export const getMetadata = ({
       images: [
         {
           url: "/thumbnail.png",
-          alt: "Driven By Fibonacci - Stablecoins",
+          alt: "EulerFi - Stablecoins",
         },
       ],
     },

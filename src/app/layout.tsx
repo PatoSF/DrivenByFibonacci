@@ -6,8 +6,8 @@ import MaxWrapper from "@/components/shared/MaxWrapper";
 import { Footer } from "@/components/shared/Footer";
 
 export const metadata = getMetadata({
-  title: "Driven By Fibonacci",
-  description: "Driven by Fibonacci is a decentralized protocol that pairs an algorithmically stabilized endogenous asset with a pegged stablecoin. It delivers predictable, risk-managed returns through volatility-reducing algorithms and incentivizes long-term commitment with tiered rewards and withdrawal penalties, making it appealing for both high-net-worth and everyday investors",
+  title: "EulerFi",
+  description: "EulerFi is a decentralized protocol that pairs an algorithmically stabilized endogenous asset with a pegged stablecoin. It delivers predictable, risk-managed returns through volatility-reducing algorithms and incentivizes long-term commitment with tiered rewards and withdrawal penalties, making it appealing for both high-net-worth and everyday investors",
 })
 
 export default function RootLayout({
