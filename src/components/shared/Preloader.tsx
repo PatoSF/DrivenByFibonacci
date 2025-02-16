@@ -30,7 +30,7 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
         fixed inset-0 
         w-screen h-screen 
         z-[9999] 
-        bg-black
+        bg-transparent
         transition-opacity duration-500 
         flex items-center justify-center
         ${isLoading ? "opacity-100" : "opacity-0 pointer-events-none"}

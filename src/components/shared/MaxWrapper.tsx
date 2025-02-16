@@ -7,7 +7,7 @@ type MaxWrapperTypes = {
 };
 
 const MaxWrapper: FC<MaxWrapperTypes> = ({ children, className }) => {
-    return <div className={cn("w-full mx-auto max-w-[1440px]", className)}>{children}</div>;
+    return <div className={cn("w-full mx-auto", className)}>{children}</div>;
 };
 
 export default MaxWrapper;
