@@ -15,7 +15,7 @@ export default function HowItWorks() {
         What Makes EulerFi Different
       </h2>
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center h-full pt-6 md:pt-16 mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center h-full pt-6 md:pt-16 mx-auto px-4">
           <div className="mr-auto place-self-center ">
             <h1 className="mb-4 max-w-xl text-2xl md:text-3xl font-extrabold leading-none tracking-tight">
               Revolutionary Endogenous Stability Mechanism
@@ -49,7 +49,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="flex flex-row-reverse gap-20 justify-between items-center h-full max-w-7xl pt-16 md:pt-28 lg:pt-40 mx-auto px-4">
+        <div className="flex flex-col md:flex-row-reverse gap-20 justify-between items-center h-full max-w-7xl pt-16 md:pt-28 lg:pt-40 mx-auto px-4">
           <div className="ml-6 md:ml-12 ">
             <h1 className="mb-4 max-w-3xl text-2xl md:text-3xl font-extrabold leading-none tracking-tight ">
             Innovative Governance
@@ -83,7 +83,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="flex justify-between items-center gap-20 h-full max-w-7xl pt-16 md:pt-28 lg:pt-40 mx-auto px-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-20 h-full max-w-7xl pt-16 md:pt-28 lg:pt-40 mx-auto px-4">
           <div className="mr-auto place-self-center ">
             <h1 className="mb-4 max-w-3xl text-2xl md:text-3xl font-extrabold leading-none tracking-tight">
               Stable and Predictable growth
@@ -110,7 +110,7 @@ export default function HowItWorks() {
                 src={graph}
                 alt=""
                 width={450}
-                className="w-full rounded-xl"
+                className="w-full  rounded-xl"
               />
             </div>
           </div>
