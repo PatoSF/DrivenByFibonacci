@@ -1,5 +1,4 @@
 "use client";
-import { Globe } from "@/components/ui/globe";
 import { LineShadowText } from "@/components/ui/line-shadow-text";
 import Spline from "@splinetool/react-spline";
 
