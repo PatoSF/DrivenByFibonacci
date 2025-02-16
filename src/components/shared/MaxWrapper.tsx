@@ -8,6 +8,7 @@ type MaxWrapperTypes = {
 
 const MaxWrapper: FC<MaxWrapperTypes> = ({ children, className }) => {
     return <div className={cn("w-full mx-auto", className)}>{children}</div>;
+
 };
 
 export default MaxWrapper;
