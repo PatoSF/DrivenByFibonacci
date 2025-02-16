@@ -15,21 +15,13 @@ export default function Hero() {
           </h1>
           <p className="font-nunitoSans text-lg text-center pointer-events-none text-color2/80">EulerFi turns data into steady returns, charts a path to financial resilience and unlock new growth opportunities.</p>
         </div>
-        {/* <div className=" mx-auto absolute top-0 left-0"> */}
-        {/* <Globe className="lg:top-[210px] md:top-[250px] top-[280px]" /> */}
+        <div className="w-full">
         <Spline
-          scene="https://prod.spline.design/Nw7qEXSPGkMODQVN/scene.splinecode"
+          scene="https://prod.spline.design/r0iW1el97aq6bkhw/scene.splinecode"
           onLoad={() => console.log("Spline scene loaded")}
-          style={{
-            width: "100%",
-            height: "100%",
-            position: "absolute",
-            top:0,
-            left:0
-          }}
-          className="mt-6"
+          className="mt-2 mx-auto left-0 right-0 relative pointer-events-none"
         />
-      {/* </div> */}
+      </div>
       </div>
     </section>
   );
