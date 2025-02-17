@@ -8,16 +8,15 @@ export default function Hero() {
       <div className="relative  w-full h-full text-center overflow-hidden bg-color1 px-4  py-12 ">
         <div className="lg:w-[60%] md:w-[70%] w-full mx-auto flex flex-col gap-1.5 justify-center items-center lg:mt-10 mt-16">
           <h1 className="font-inter text-balance leading-none pointer-events-none lg:text-6xl md:text-4xl text-[30px] font-bold text-color2 text-center ">
-            <LineShadowText className="" shadowColor={"black"}>
-              Discover a New Dimension of
-              Stability
+            <LineShadowText className="whitespace-nowrap line-shadow-text" shadowColor={"black"}>
+              Discover a New Dimension of Stability
             </LineShadowText>
           </h1>
           <p className="font-nunitoSans text-lg text-center pointer-events-none text-color2/80">EulerFi turns data into steady returns, charts a path to financial resilience and unlock new growth opportunities.</p>
         </div>
         <div className="w-full">
         <Spline
-          scene="https://prod.spline.design/r0iW1el97aq6bkhw/scene.splinecode"
+          scene="https://draft.spline.design/lHGIRIHXwoDBDfut/scene.splinecode"
           onLoad={() => console.log("Spline scene loaded")}
           className="mt-2 mx-auto left-0 right-0 relative pointer-events-none"
         />

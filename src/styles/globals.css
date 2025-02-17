@@ -65,6 +65,11 @@ body {
   }
 }
 
+.line-shadow-text {
+  text-shadow: 0px 0px 2px;
+}
+
+
 @layer base {
   * {
     @apply border-border;

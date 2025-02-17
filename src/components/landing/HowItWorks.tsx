@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import img1 from "../../../public/fibo-1.png";
-import img2 from "../../../public/fibo-2.png";
+import img1 from "../../../public/palace.jpg";
+import img2 from "../../../public/Stairs.jpg";
+import img3 from "../../../public/library.jpg";
 import graph from "../../../public/fibo-graph.png"; 
 
 // import eth from "../../../public/landing/eth.png";
@@ -107,10 +108,10 @@ export default function HowItWorks() {
             <div className="absolute aspect-square bg-[#ffafcb]/70 rounded-full blur-[102px] flex-none left-1/2 top-[37px] -translate-x-1/2 w-[85%]"></div>
             <div className="relative">
               <Image
-                src={graph}
+                src={img3}
                 alt=""
                 width={450}
-                className="w-full  rounded-xl"
+                className="w-full"
               />
             </div>
           </div>

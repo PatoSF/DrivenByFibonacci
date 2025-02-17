@@ -10,54 +10,54 @@ type NavlinksType = {
 
 export const NavLinks: NavlinksType[] = [
   {
-    name: "USDC",
+    name: "Fibonacci",
     href: "#",
     subNav: [
       {
-        name: "About USDC",
+        name: "About FIBO",
         href: "#",
-        description: "The world's digital money",
+        description: "The World's First Digital Commodity",
       },
       {
-        name: "USDC Overview",
+        name: "Institutional FIBO",
         href: "#",
-        description: "Learn the basics",
+        description: "FIBOX for Institutions",
       },
       {
-        name: "USDC Features",
+        name: "Euler",
         href: "#",
-        description: "Key benefits and functionality",
+        description: "One Way Ticket to Freedom",
       },
       {
-        name: "USDC FAQ",
+        name: "Fundamental Dashboard",
         href: "#",
-        description: "Frequently asked questions",
+        description: "Custom metrics for your needs",
       },
     ],
   },
   {
-    name: "Platform",
+    name: "Equilibrium",
     href: "#",
     subNav: [
       {
-        name: "Platform Overview",
+        name: "About Equilibrium",
         href: "#",
-        description: "Discover our platform",
+        description: "The Power of Diversification",
       },
       {
-        name: "Platform Features",
+        name: "Collateral Monitoring",
         href: "#",
-        description: "Detailed feature list",
+        description: "Real-time monitoring of collateral",
       },
       {
-        name: "Platform Pricing",
+        name: "Community Perks",
         href: "#",
-        description: "Cost breakdown and plans",
+        description: "Minting $EQLB with $FIBO",
       },
       {
-        name: "Platform Roadmap",
+        name: "Equilibrium Analytics",
         href: "#",
-        description: "Upcoming improvements",
+        description: "Your Equilibrium Dashboard",
       },
     ],
   },
@@ -68,48 +68,43 @@ export const NavLinks: NavlinksType[] = [
       {
         name: "Enterprise Solutions",
         href: "#",
-        description: "Tailored for large businesses",
+        description: "Tailored for banks and large businesses",
       },
       {
         name: "SMB Solutions",
         href: "#",
-        description: "Solutions for small to medium businesses",
+        description: "Solutions for small to medium businesses and professional investors",
       },
       {
-        name: "Financial Solutions",
+        name: "Cross-Chain Payments",
         href: "#",
-        description: "Custom financial products",
+        description: "Invest from anywhere",
       },
       {
-        name: "Innovative Solutions",
+        name: "Real-Time Market Data",
         href: "#",
-        description: "Cutting edge technology",
+        description: "Chainlink data feeds",
       },
     ],
   },
   {
-    name: "Developer",
+    name: "Market",
     href: "#",
     subNav: [
       {
-        name: "API Documentation",
+        name: "EulerFi's Insider Market",
         href: "#",
-        description: "Comprehensive API guides",
+        description: "Trade with confidence",
       },
       {
-        name: "Developer Tools",
+        name: "Token Listing",
         href: "#",
-        description: "Everything you need to build",
+        description: "Tokens we offer",
       },
       {
-        name: "SDKs & Libraries",
+        name: "Holders",
         href: "#",
-        description: "Integrate with ease",
-      },
-      {
-        name: "Community Support",
-        href: "#",
-        description: "Join our developer community",
+        description: "The Holders of EulerFi",
       },
     ],
   },
@@ -118,14 +113,9 @@ export const NavLinks: NavlinksType[] = [
     href: "#",
     subNav: [
       {
-        name: "Blog",
+        name: "Documentation",
         href: "#",
-        description: "Latest news and updates",
-      },
-      {
-        name: "Case Studies",
-        href: "#",
-        description: "Success stories",
+        description: "Everything you need to know about our contracts", 
       },
       {
         name: "Whitepapers",
@@ -133,40 +123,37 @@ export const NavLinks: NavlinksType[] = [
         description: "In-depth research",
       },
       {
-        name: "Webinars",
+        name: "Blogs",
         href: "#",
-        description: "Upcoming educational sessions",
+        description: "Latest news and updates",
       },
     ],
   },
   {
-    name: "Partners",
+    name: "Team",
     href: "#",
     subNav: [
       {
-        name: "Technology Partners",
+        name: "EulerFi Team",
         href: "#",
-        description: "Our tech allies",
+        description: "The people behind this masterpiece",
+      },
+      {
+        name: "Top Investors",
+        href: "#",
+        description: "Backed by the best",
       },
       {
         name: "Business Partners",
         href: "#",
-        description: "Collaborative growth",
+        description: "Collaborative partnerships",
       },
       {
-        name: "Strategic Partners",
+        name: "DAO Governance",
         href: "#",
-        description: "Key alliances",
-      },
-      {
-        name: "Partner Programs",
-        href: "#",
-        description: "Join our partner network",
+        description: "The Decentralized Council",
       },
     ],
   },
-  {
-    name: "Transparency",
-    href: "#",
-  },
+
 ];

@@ -7,7 +7,7 @@ const Logo = ({ classname, image, href }: { classname: string, image: string, hr
     return (
         <Link href={href} className="flex items-center gap-2">
             <Image src={image} alt="Logo" className={classname} width={955} height={1060} priority quality={100} />
-            <span className='text-2xl text-color2 font-marcellus font-extrabold'>EulerFi</span>
+            <span className='text-3xl text-color2 font-marcellus font-extrabold'>EulerFi</span>
         </Link>
     )
 }
