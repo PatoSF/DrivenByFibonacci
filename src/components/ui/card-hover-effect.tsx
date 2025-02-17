@@ -24,11 +24,11 @@ export const HoverEffect = ({
       {items.map((item, idx) => (
         <div
           key={idx}
-          className="relative group block p-[2px] h-full w-full"
+          className="relative group block p-[1px] h-full w-full"
         >
 
           <div
-            className="absolute inset-0 h-full w-full bg-gradient-to-tr from-[#A07CFE] via-[#FE8FB5] to-[#FFBE7B] block rounded-2xl"
+            className="absolute inset-0 h-full w-full bg-color1/10 group-hover:bg-gradient-to-tr group-hover:from-[#A07CFE] group-hover:via-[#FE8FB5] group-hover:to-[#FFBE7B] transition-all block duration-300 rounded-2xl"
           />
           <Card>
             <div className="flex justify-start mb-4 text-zinc-200 text-5xl">
