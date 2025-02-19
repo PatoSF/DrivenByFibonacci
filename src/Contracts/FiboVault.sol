@@ -6,6 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
 import {ERC4626} from "solmate/tokens/ERC4626.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
 /**
  * @title FIBO Vault 
@@ -46,6 +47,27 @@ contract FiboVault is ERC4626, ERC20, AccessControl {
      // } 
     // This mapping can be used : mapping(uint256 => mapping(uint256 => Substage))
     mapping(uint256 => uint256) public substageInfo; 
+
+    struct TokenListing {
+        uint256 listingId;
+        address owner;
+        address tokenAddress;
+        uint256 amount;
+        address desiredToken; // The token user wants in exchange
+    }
+
+    mapping(uint256 => TokenListing) public listings;
+    uint256 public listingCounter;
+
+    event TokensListed(
+        uint256 indexed listingId,
+        address indexed owner,
+        address indexed token,
+        uint256 amount,
+        address desiredToken
+    );
+
+    event ListingRemoved(uint256 indexed listingId, address indexed owner);
 
     /**
      * @dev Constructor initializes the ERC4626 vault with FIBO as the asset.
@@ -145,5 +167,63 @@ contract FiboVault is ERC4626, ERC20, AccessControl {
     */
     function holderBalance(address account) public view returns (uint256) {
         return balances[account];
+    }
+
+    /**
+     * @notice List tokens for exchange using EIP-2612 permit
+     */
+    function listTokens(
+        address token,
+        uint256 amount,
+        address desiredToken,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
+        require(amount > 0, "Amount must be greater than zero");
+        require(desiredToken != address(0), "Invalid desired token address");
+
+        // Permit approval (gasless)
+        ERC20Permit(token).permit(
+            msg.sender,
+            address(this),
+            amount,
+            deadline,
+            v,
+            r,
+            s
+        );
+
+        // Transfer tokens to contract
+        IERC20(token).transferFrom(msg.sender, address(this), amount);
+
+        // Store listing
+        listingCounter++;
+        listings[listingCounter] = TokenListing({
+            owner: msg.sender,
+            tokenAddress: token,
+            amount: amount,
+            desiredToken: desiredToken
+        });
+
+        emit TokensListed(listingCounter, msg.sender, token, amount, desiredToken);
+    }
+
+    /**
+     * @notice Remove a token listing (only owner can remove)
+     */
+    function removeListing(uint256 listingId) external {
+        TokenListing storage listing = listings[listingId];
+        require(msg.sender == listing.owner, "Only owner can remove listing");
+        require(listing.amount > 0, "Listing does not exist");
+
+        // Transfer tokens back to the owner
+        IERC20(listing.tokenAddress).transfer(listing.owner, listing.amount);
+
+        // Delete listing
+        delete listings[listingId];
+
+        emit ListingRemoved(listingId, msg.sender);
     }
 }
