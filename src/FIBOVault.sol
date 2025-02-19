@@ -3,8 +3,8 @@ pragma solidity ^0.8.27;
 
 import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
-import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
+import {ERC4626} from "solmate/tokens/ERC4626.sol";
 
 /// @title FIBO Vault 
 /// @author Team EulerFi (visit https://eulerfi.com)
@@ -15,7 +15,6 @@ contract FiboVault is ERC20, ERC4626 {
     uint256 symbol;
     uint256 public stage;
     uint256 public substage;
-    uint256 public totalsupply;
     uint256 public price;
     IERC20 public token;
     address[] public listedAddresses;
@@ -181,24 +180,14 @@ contract FiboVault is ERC20, ERC4626 {
     *
     * See {IERC20Metadata-decimals}.
     */
-    function decimals() public view override(ERC20, ERC4626) returns (uint8) {
+    function decimals() public view override returns (uint8) {
     // You can choose to return the decimals from either ERC20 or ERC4626
     // For example, return ERC20.decimals();
-        return ERC4626.decimals();
+        return ERC20.decimals();
     }
 
     /**
-    * @dev Returns the address of the underlying token used for the Vault for accounting, depositing, and withdrawing.
-    *
-    * - MUST be an ERC-20 token contract.
-    * - MUST NOT revert.
-    */
-    function asset() public view override returns (address) {
-        return ERC4626.asset();
-    }
-
-    /**
-    * @notice We can also use totalSupply() or balanceOf(address(this)) instead of totalAssets()
+    * @notice We can also use balanceOf(address(this)) 
     * @dev Returns the total amount of the FIBO tokens that is “managed” by Vault.
     * @return the current total FIBO supply
     * - SHOULD include any compounding that occurs from yield.
@@ -206,7 +195,7 @@ contract FiboVault is ERC20, ERC4626 {
     * - MUST NOT revert.
     */
     function totalAssets() public view override returns (uint256) {
-        return ERC4626.totalAssets();
+        return ERC20.totalSupply();
     }
 
     /**
@@ -214,7 +203,7 @@ contract FiboVault is ERC20, ERC4626 {
     * @dev Should retrieve the balance of each user
     * @return the balance of FIBO for an address
     */
-    function balanceOf(address account) public view override returns (uint256) {
+    function HolderBalance(address account) public view returns (uint256) {
         return balance[account];
     }
 
