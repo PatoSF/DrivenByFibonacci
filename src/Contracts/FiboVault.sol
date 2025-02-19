@@ -1,133 +1,149 @@
-//SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.27;
 
-import "https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC4626.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Factory.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Pair.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
+import {ERC4626} from "solmate/tokens/ERC4626.sol";
 
-contract FiboVault is ERC4626 {
-    // a mapping that checks if a user has deposited the token
-    mapping(address => uint256) public shareHolder;
+/**
+ * @title FIBO Vault 
+ * @author Team EulerFi
+ * @notice An ERC4626 vault for locked ERC20 tokens with DAO-controlled stages & substages.
+ */
+contract FiboVault is ERC4626, ERC20, AccessControl {
+    /// @dev Roles for governance
+    bytes32 public constant EXECUTOR_ROLE = keccak256("EXECUTOR_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant MULTISIG_ROLE = keccak256("MULTISIG_ROLE");
 
-    address public owner;
-    IUniswapV2Router02 public dexRouter;
-    address public lpToken;
+    /// @dev Timelock mechanism for controlled function execution
+    TimelockController public timelock;
 
-    event LiquidityAdded(uint256 tokenAmount, uint256 ethAmount);
-    event LiquidityRemoved(uint256 lpTokenAmount, uint256 tokenAmount, uint256 ethAmount);
+    /// @dev Stage & substage tracking
+    uint256 public stage;
+    uint256 public substage;
+    uint256 public price;
+    address[] public listedAddresses;
 
+    // ERC4626 already provides name() and symbol() so no need for name and symbol variables do consider this.
 
-    constructor(
-        ERC20 _asset,
-        string memory _name,
-        string memory _symbol,
-        address _dexRouter
-    ) ERC4626(_asset, _name, _symbol) {
-        owner = msg.sender;
-        dexRouter = IUniswapV2Router02(_dexRouter);
-        address factory = dexRouter.factory();
-        lpToken = IUniswapV2Factory(factory).getPair(address(asset), dexRouter.WETH());
-    }
+    mapping (address => mapping (address => uint256)) public amountlisted;
+    
+    /// @dev Tracks user balances
+    mapping(address => uint256) public balances;
+    
+    /// @dev Token being managed
+    IERC20 public immutable asset;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not owner");
-        _;
-    }
-
+    /// @dev Tracks substages per stage
+    // If each substage only needs one piece of data (like duration or price increase) then below mapping should be used because its gas-efficient.
+    // If each substage has multiple properties (like duration, price, and supply increase) then 
+    // struct Substage {
+       // uint256 duration;    // Duration in days
+       // uint256 priceIncrease;  // Price increase per substage
+     // } 
+    // This mapping can be used : mapping(uint256 => mapping(uint256 => Substage))
+    mapping(uint256 => uint256) public substageInfo; 
 
     /**
-     * @notice function to deposit assets and receive vault tokens in exchange
-     * @param _assets amount of the asset token
+     * @dev Constructor initializes the ERC4626 vault with FIBO as the asset.
+     *      It also sets up a TimelockController for governance.
      */
-    function _deposit(uint _assets) public {
-        require(_assets > 0, "Deposit less than Zero");
-        deposit(_assets, msg.sender);
-        // Increase the share of the user
-        shareHolder[msg.sender] += _assets;
+    constructor(IERC20 _asset, address _timelock) 
+        ERC4626(ERC20(address(_asset))) 
+    {
+        asset = _asset;
+        timelock = TimelockController(_timelock);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(EXECUTOR_ROLE, msg.sender);
+        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(MULTISIG_ROLE, msg.sender);
+        _mint(address(this), 1e9 * (10 ** 18)); // 1 Billion FIBO tokens
     }
 
     /**
-     * @notice Function to allow msg.sender to withdraw their deposit plus accrued interest
-     * @param _shares amount of shares the user wants to convert
-     * @param _receiver address of the user who will receive the assets
+     * @notice Advances the stage, enforcing a 365-day delay.
+     * @dev Only callable by EXECUTOR_ROLE.
      */
-    function _withdraw(uint _shares, address _receiver) public {
-        require(_shares > 0, "withdraw must be greater than Zero");
-        require(_receiver != address(0), "Zero Address");
-        require(shareHolder[msg.sender] > 0, "Not a share holder");
-        // checks that the caller has more shares than they are trying to withdraw.
-        require(shareHolder[msg.sender] >= _shares, "Not enough shares");
-        // Calculate 10% yield on the withdrawal amount
-        uint256 percent = (10 * _shares) / 100;
-        // Calculate the total asset amount as the sum of the share amount plus 10% of the share amount.
-        uint256 assets = _shares + percent;
-        redeem(assets, _receiver, msg.sender);
-        // Decrease the share of the user
-        shareHolder[msg.sender] -= _shares;
+    function setStage() internal onlyRole(EXECUTOR_ROLE) returns(uint256) {
+        require(block.timestamp >= timelock.getMinDelay() + 365 days, "Timelock: Not enough time passed");
+        stage += 1;
+        // If SetStage() is called elsewhere and the return value is needed → keep it
+        // If it's only modifying stage without needing the value elsewhere → remove it
+        return stage;
     }
 
-    // returns total number of assets
+    /**
+     * @notice Updates the number of substages before transitioning to a new stage.
+     * @dev Must be set before moving to the next stage.
+     */
+    function setSubstage(uint256 _substage) internal onlyRole(EXECUTOR_ROLE) returns(uint256) {
+        require(_substage > 0, "Invalid substage count");
+        substage = _substage;
+        // Same if used somewhere then only return substage.
+        return substage;
+    }
+
+    /**
+     * @notice Updates the token price per substage.
+     * @dev Ensures the new price is greater than the previous price.
+     */
+    function setPrice(uint256 newPrice) external onlyRole(EXECUTOR_ROLE) returns (uint256) {
+        require(newPrice > price, "New price must be higher");
+        require(substage > 0, "Substage must be greater than zero") // Added to avoid 0 check for substage
+        price = newPrice / substage;
+        return price;
+    }
+
+    /**
+     * @notice Mints new tokens at the beginning of each substage.
+     * @dev Can only be called internally by governance functions.
+     */
+    function mint(uint256 amount) internal onlyRole(MINTER_ROLE) {
+        uint256 prevSupply = totalAssets();
+        _mint(address(this), amount);
+        require(totalAssets() > prevSupply, "Minting failed: Supply did not increase");
+    }
+
+    /**
+     * @notice Burns tokens, callable only by the protocol via MULTISIG_ROLE.
+     */
+    function burn(uint256 amount) external onlyRole(MULTISIG_ROLE) {
+        require(amount > 0, "Cannot burn 0 tokens");
+        _burn(address(this), amount);
+    }
+
+    /**
+     * @notice Transfers balance ownership from one user to another.
+     */
+    function updateBalance(address currentHolder, address newHolder, uint256 amount) internal returns (uint256) {
+        require(amount > 0, "Amount to transfer should be greater than 0");
+        require(balance[currentHolder] >= amount, "Not enough balance");
+        // require(amountlisted[currentHolder][address(token)] >= amount, "Not enough balance"); => Not required doing the same thing in above require statement
+        balances[currentHolder] -= amount;
+        balances[newHolder] += amount;
+        return amount;
+    }
+
+    function decimals() public view override returns (uint8) {
+        return ERC20.decimals();
+    }
+
+    /**
+     * @notice Returns the total assets in the vault.
+     */
     function totalAssets() public view override returns (uint256) {
-        return asset.balanceOf(address(this));
+        return ERC20.totalSupply();
     }
 
-    // returns total balance of user
-    function totalAssetsOfUser(address _user) public view returns (uint256) {
-        return asset.balanceOf(_user);
+    /**
+    * @notice Override the balanceOf function from the ERC20 contract
+    * @dev Should retrieve the balance of each user
+    * @return the balance of FIBO for an address
+    */
+    function holderBalance(address account) public view returns (uint256) {
+        return balances[account];
     }
-
-    // Listing tokens on uniswap
-    function listOnDex(uint256 tokenAmount, uint256 ethAmount) external onlyOwner {
-        require(tokenAmount > 0 && ethAmount > 0, "Invalid amounts");
-        require(asset.balanceOf(address(this)) >= tokenAmount, "Insufficient tokens");
-        
-        asset.approve(address(dexRouter), tokenAmount);
-        
-        dexRouter.addLiquidityETH{value: ethAmount}(
-            address(asset),
-            tokenAmount,
-            0, 
-            0, 
-            owner,
-            block.timestamp + 300 
-        );
-
-        emit LiquidityAdded(tokenAmount, ethAmount);
-    }
-
-    // Delist tokens from uniswap
-    function withdrawLiquidity(uint256 lpTokenAmount) external onlyOwner {
-        require(lpTokenAmount > 0, "Invalid LP token amount");
-        require(IERC20(lpToken).balanceOf(address(this)) >= lpTokenAmount, "Insufficient LP tokens");
-        
-        IERC20(lpToken).approve(address(dexRouter), lpTokenAmount);
-        
-        (uint256 amountToken, uint256 amountETH) = dexRouter.removeLiquidityETH(
-            address(asset),
-            lpTokenAmount,
-            0,
-            0,
-            owner,
-            block.timestamp + 300
-        );
-
-        emit LiquidityRemoved(lpTokenAmount, amountToken, amountETH);
-    }
-
-    // After Liquidity removal from DEX if owner wants to claim all eth and vault tokens he can do so by manually calling below functions
-    function withdrawAllVaultTokens() external onlyOwner {
-        uint256 vaultBalance = asset.balanceOf(address(this));
-        require(vaultBalance > 0, "No vault tokens to withdraw");
-        asset.transfer(owner, vaultBalance);
-    }
-
-    function withdrawETH() external onlyOwner {
-        uint256 contractBalance = address(this).balance;
-        require(contractBalance > 0, "No ETH to withdraw");
-        payable(owner).transfer(contractBalance);
-    }
-
-    receive() external payable {}
 }
