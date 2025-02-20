@@ -4,17 +4,15 @@ pragma solidity ^0.8.27;
 import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
-import {ERC4626} from "solmate/tokens/ERC4626.sol";
+import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 
 /// @title FIBO Vault 
 /// @author Team EulerFi (visit https://eulerfi.com)
 /// @dev Standard ERC4626 Vault that can mint locked ERC20 tokens
 
 contract FiboVault is ERC20, ERC4626 {
-    uint256 name;
-    uint256 symbol;
     uint256 public stage;
-    uint256 public substage;
+    uint256 public substage; 
     uint256 public price;
     IERC20 public token;
     address[] public listedAddresses;
@@ -28,7 +26,15 @@ contract FiboVault is ERC20, ERC4626 {
 * 
 **/
     
-    constructor() ERC4626(ERC20("Fibonacci", "FIBO")) {
+    function updatecurrentbalance()
+        //it needs to calculate the new balance of the user
+        //and the accumulated tokens he received
+        //1000 
+        //200
+        //1200
+        // 1M tokens 
+
+    constructor() ERC4626(ERC20("Fibonacci", "FIBO"), "Fibonacci", "FIBO") {
         _mint(address(this), 1e9 * (10 ** 18)); // 1 Billion FIBO tokens
     }
 
@@ -199,8 +205,8 @@ contract FiboVault is ERC20, ERC4626 {
     }
 
     /**
-    * @notice Overrode the balanceOf function from the ERC20 contract
-    * @dev Should retrieve the balance of each user
+    * @notice function from the ERC20 contract
+    * @dev Retrieves the balance of each user
     * @return the balance of FIBO for an address
     */
     function HolderBalance(address account) public view returns (uint256) {
@@ -208,3 +214,54 @@ contract FiboVault is ERC20, ERC4626 {
     }
 
 }
+
+
+
+
+   struct TokenData {
+        uint256 price;
+        uint256 totalSupply;
+    }
+
+    mapping(bytes32 tokenSymbolHash => mapping(uint256 stage => mapping(uint256 subStage => TokenData))) private
+        tokenSymbolHashToStageToSubstageToTokenData;
+
+
+
+
+
+    uint256 public stage;
+    uint256 public substage;
+    uint256 public price;
+    IERC20 public token;
+    address[] public listedAddresses;
+    mapping (address => uint256) public balance;
+    mapping (address => mapping (address => uint256)) public amountlisted; 
+    mapping (uint256 => mapping (uint256 => uint256[])) public SubstageInfo; 
+
+
+
+    input the address of a user -> it will let us see what are all the erc20 tokens
+    that the user is currently listing -> amount
+    mapping (address => address[] => uint256) public tokens;
+    mapping (address => mapping (address => uint256)) public amountlisted; 
+
+    bob has 1000 tokens
+    the first 200 tokens, he wants to exchange them with SCR
+    the other 300 // // // UNI
+
+    1000 | 200 | SCR | success 
+          | 400 | UNI 
+          | 200 | HBAR
+    ... 
+
+
+    struct TokenBalance {
+        address tokenAddress;
+        uint256 balance;
+    }
+    mapping(address user => TokenBalance[]) public userBalances;
+
+
+
+    

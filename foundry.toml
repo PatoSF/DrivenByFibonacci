@@ -4,6 +4,7 @@ out = "out"
 libs = ["lib"]
 solc = "0.8.27"
 remappings = [
-  '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/', 'solmate/=lib/solmate/src/',
+  '@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/', 
+  'solmate/src/=lib/solmate/',
 ]
 
