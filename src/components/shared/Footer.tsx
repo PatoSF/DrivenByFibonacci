@@ -16,9 +16,9 @@ export const Footer = () => {
 
     return (
         <footer className="bg-color2 pt-20 pb-14">
-            <div className="max-w-7xl mx-auto px-4 lg:px-10">
+            <div className="max-w-[1380px] mx-auto px-4 lg:px-10">
                 {/* Navigation Grid */}
-                <div className="container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                <div className="container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
                     {NavLinks.filter((link) => link.name !== "Transparency" && link.name !== "Platform").map((link) => (
                         <div key={link.name} className="flex flex-col space-y-4">
                             <h2 className="font-medium font-sora text-color1/90 text-base">{link.name}</h2>

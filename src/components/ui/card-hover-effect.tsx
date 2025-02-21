@@ -31,7 +31,7 @@ export const HoverEffect = ({
             className="absolute inset-0 h-full w-full bg-color1/10 group-hover:bg-gradient-to-tr group-hover:from-[#A07CFE] group-hover:via-[#FE8FB5] group-hover:to-[#FFBE7B] transition-all block duration-300 rounded-2xl"
           />
           <Card>
-            <div className="flex justify-start mb-4 text-zinc-200 text-5xl">
+            <div className="flex justify-start mb-4 text-zinc-200 text-5xl lg:text-6xl">
               {item.icon}
             </div>
             <CardTitle>{item.title}</CardTitle>
@@ -71,7 +71,7 @@ export const CardTitle = ({
   children: React.ReactNode;
 }) => {
   return (
-    <h4 className={cn("text-zinc-200 font-bold tracking-wide mt-4", className)}>
+    <h4 className={cn("text-zinc-200 font-bold text-xl tracking-wide mt-4", className)}>
       {children}
     </h4>
   );
@@ -86,7 +86,7 @@ export const CardDescription = ({
   return (
     <p
       className={cn(
-        "mt-4 text-zinc-400 tracking-wide leading-relaxed text-sm",
+        "mt-4 text-zinc-400 tracking-wide leading-relaxed text-base",
         className
       )}
     >
