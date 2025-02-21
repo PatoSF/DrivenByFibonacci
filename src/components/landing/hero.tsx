@@ -8,7 +8,7 @@ export default function Hero() {
       <div className="relative  w-full h-full text-center overflow-hidden bg-color1 px-4  py-12 ">
         <div className="lg:w-[60%] md:w-[70%] w-full mx-auto flex flex-col gap-1.5 justify-center items-center lg:mt-10 mt-16 px-4 md:px-0">
           <h1 className="font-inter md:text-balance leading-none pointer-events-none pt-10 lg:text-6xl md:text-4xl text-[30px] font-bold text-color2 text-center ">
-            <LineShadowText className="whitespace-nowrap line-shadow-text" shadowColor={"black"}>
+            <LineShadowText className="md:whitespace-nowrap tracking-wide line-shadow-text" shadowColor={"black"}>
               Discover a New Dimension of Stability
             </LineShadowText>
           </h1>

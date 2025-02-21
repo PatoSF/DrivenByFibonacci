@@ -83,7 +83,7 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
     const loadTimer = setTimeout(() => {
       setIsLoading(false);
       if (onLoadComplete) onLoadComplete();
-    }, 10000);
+    }, 12000);
 
     return () => {
       clearTimeout(fadeOutTimer);
