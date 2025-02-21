@@ -6,8 +6,8 @@ import Marquee from "react-fast-marquee";
 const ListOfPartners = () => {
     return (
         <section className="w-full my-10">
-            <div className="w-full relative h-[65px] before:absolute before:left-0 before:top-0 lg:before:w-[30%] md:before:w-[230px] before:w-[83px] before:h-full before:bg-gradient-to-r before:from-color1 before:via-color1 before:to-color1/10 before:z-10 after:absolute after:right-0 after:top-0 lg:after:w-[30%] md:after:w-[230px] after:w-[83px] after:h-full after:bg-gradient-to-l after:from-color1 after:via-color1 after:to-color1/10 after:z-10">
-                <Marquee className="h-full" pauseOnHover={true}>
+            <div className="w-full relative bg-color1 h-[65px] before:absolute before:left-0 before:top-0 lg:before:w-[30%] md:before:w-[230px] before:w-[83px] before:h-full before:bg-gradient-to-r before:from-color1 before:via-color1 before:to-color1/10 before:z-10 after:absolute after:right-0 after:top-0 lg:after:w-[30%] md:after:w-[230px] after:w-[83px] after:h-full after:bg-gradient-to-l after:from-color1 after:via-color1 after:to-color1/10 after:z-10">
+                <Marquee className="h-full" pauseOnHover={false}>
                     <section className="flex items-center gap-12">
                         {/* BlackRock */}
                         <div className="h-full w-[150px] flex items-center justify-center">
