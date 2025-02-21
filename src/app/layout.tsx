@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`antialiased`}
+        className={`antialiased bg-color1`}
       >
         {/* ClientLayout handles the spline preloader */}
         <ClientLayout>

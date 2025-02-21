@@ -30,7 +30,7 @@ const NavigationMenuList = React.forwardRef<
   <NavigationMenuPrimitive.List
     ref={ref}
     className={cn(
-      "group flex lg:flex-row flex-col flex-1 list-none items-center justify-center space-x-1",
+      "group flex lg:flex-row flex-col flex-1 list-none items-center justify-center",
       className
     )}
     {...props}
@@ -41,7 +41,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-xl bg-transparent px-4 py-2 text-base font-medium transition-colors hover:bg-[#CC4976] hover:text-white focus:bg-[#CC4976] focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-[#CC4976] data-[state=open]:bg-[#CC4976] data-[state=open]:text-white data-[active]:text-white"
+  "group inline-flex  w-max items-center justify-center rounded-md bg-transparent px-2 py-1 text-base font-medium transition-colors hover:bg-[#CC4976] hover:text-white focus:bg-[#CC4976] focus:text-white focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-[#CC4976] data-[state=open]:bg-[#CC4976] data-[state=open]:text-white data-[active]:text-white relative"
 )
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -55,9 +55,11 @@ const NavigationMenuTrigger = React.forwardRef<
   >
     {children}{" "}
     <ChevronDown
-      className="relative top-[1px] ml-1 h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180"
+      className="relative ml-1 h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180"
       aria-hidden="true"
     />
+    {/* Triangle element */}
+    <span className="absolute left-1/2 top-full -mt-[2px] hidden h-0 w-0 -translate-x-1/2 border-x-8 border-t-8 border-b-0 border-solid border-transparent border-t-[#CC4976] group-data-[state=open]:block"></span>
   </NavigationMenuPrimitive.Trigger>
 ))
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName

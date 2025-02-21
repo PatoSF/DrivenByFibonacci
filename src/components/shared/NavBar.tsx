@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/navigation-menu"
 import React from "react";
 import { cn } from "@/lib/utils";
-import { NavLinks } from "@/utils/NavLinks";
+import { NavLinks, NavlinksType, SubNavType } from "@/utils/NavLinks";
 import MobileNav from "./MobileNav";
+import { CgArrowLongRight } from "react-icons/cg";
+
 
 export default function Nav() {
   const { scrollYProgress } = useScroll();
@@ -34,32 +36,54 @@ export default function Nav() {
       />
       <nav className="w-full flex items-center justify-between py-3 px-8">
 
-        <Logo classname="w-[45px]" image="/fibo-logo.png" href="/" />
+        <Logo classname="w-[45px] lg:w-[60px]" image="/fibo-logo.png" href="/" />
 
         {/* Navigation Links */}
         <main className="hidden lg:flex items-center">
           <NavigationMenu>
             <NavigationMenuList>
               {
-                NavLinks.map((link, index) => (
+                NavLinks.map((link: NavlinksType, index) => (
                   <NavigationMenuItem key={index} className="font-nunitoSans bg-transparent">
-                    { 
+                    {
                       link.subNav ? (
                         <>
                           <NavigationMenuTrigger>{link.name}</NavigationMenuTrigger>
 
                           <NavigationMenuContent className="rounded-xl">
-                            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                              {link.subNav.map((subnav, i) => (
-                                <ListItem
-                                  key={i}
-                                  title={subnav.name}
-                                  href={subnav.href}
-                                >
-                                  {subnav.description}
-                                </ListItem>
-                              ))}
-                            </ul>
+                            {
+                              link.subNav.length > 3 && (
+                                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                                  {link.subNav.map((subnav: SubNavType, i) => (
+                                    <ListItem
+                                      key={i}
+                                      title={subnav.name}
+                                      href={subnav.href}
+                                      icon={subnav.icon}
+                                    >
+                                      {subnav.description}
+                                    </ListItem>
+                                  ))}
+                                </ul>
+                              )
+                            }
+                            {
+                              link.subNav.length <= 3 && (
+                                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                                  {link.subNav.map((subnav: SubNavType, i) => (
+                                    <ListItem
+                                      key={i}
+                                      title={subnav.name}
+                                      href={subnav.href}
+                                      icon={subnav.icon}
+                                    >
+                                      {subnav.description}
+                                    </ListItem>
+                                  ))}
+                                </ul>
+                              )
+                            }
+
                           </NavigationMenuContent>
                         </>
                       )
@@ -80,7 +104,7 @@ export default function Nav() {
 
 
         <div className='flex items-center gap-[24px]'>
-          <Button className="bg-color5 rounded-lg transition-all duration-200 hover:bg-color2 text-white">Launch App</Button>
+          <Button className="bg-color5 rounded-lg transition-all font-medium font-inter duration-200 hover:bg-color2 text-white">Launch App</Button>
 
           <div className="lg:hidden flex items-center">
             <MobileNav />
@@ -94,23 +118,31 @@ export default function Nav() {
 
 export const ListItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+  { title: string; icon: React.ReactNode } & React.ComponentPropsWithoutRef<"a">
+>(({ className, title, icon, children, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
         <a
           ref={ref}
           className={cn(
-            "block select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "flex items-center gap-2 select-none space-y-1 rounded-lg p-3 leading-none no-underline outline-none transition-all hover:bg-gray-100 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group",
             className
           )}
           {...props}
         >
-          <div className="text-sm font-medium font-inter leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm font-nunitoSans leading-snug text-muted-foreground">
-            {children}
-          </p>
+          <div className="text-color2">
+            {icon}
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <div className="text-sm font-medium font-inter leading-none flex items-center gap-3">
+              {title}
+              <CgArrowLongRight className="text-color2 transition-opacity duration-300 text-xl opacity-0 group-hover:opacity-100" />
+            </div>
+            <p className="line-clamp-2 text-sm font-nunitoSans leading-snug text-muted-foreground">
+              {children}
+            </p>
+          </div>
         </a>
       </NavigationMenuLink>
     </li>
