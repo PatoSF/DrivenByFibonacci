@@ -32,14 +32,14 @@ contract PriceConverterTest is Test {
 
     function setUp() public {}
 
-    function testGet_SCR_USD_ConversionRate() public view {
+    function test_get_SCR_USD_ConversionRate() public view {
         string memory baseTokenSymbol = "SCR";
         uint256 quoteTokenAmount = baseTokenSymbol.getConversionRate(baseTokenAmount);
         console.log("%s SCR = %s USD", baseTokenAmount, quoteTokenAmount);
         assertNotEq(quoteTokenAmount, 0);
     }
 
-    function testGetConversionRatesForAllSupportedBaseTokens() public view {
+    function test_getConversionRatesForAllSupportedBaseTokens() public view {
         for (uint256 i = 0; i < supportedBaseTokens.length; i++) {
             uint256 quoteTokenAmount = supportedBaseTokens[i].getConversionRate(baseTokenAmount);
             console.log("%s %s = %s USD", baseTokenAmount, supportedBaseTokens[i], quoteTokenAmount);

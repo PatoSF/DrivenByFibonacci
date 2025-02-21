@@ -22,12 +22,19 @@ $ forge test --fork-url $SCROLL_MAINNET_RPC_URL
 #### Run Test To Get Conversion Rates In USD For All The Supported Base Tokens
 
 ```shell
-$ forge test --mt testGetConversionRatesForAllSupportedBaseTokens --fork-url $SCROLL_MAINNET_RPC_URL -vvv
+$ forge test --mt test_getConversionRatesForAllSupportedBaseTokens --fork-url $SCROLL_MAINNET_RPC_URL -vvv
 ```
+
+#### Run Test To Write Token Data And Get Latest Stage & Substage 
+
+```shell
+$ forge test --mt test_writeTokenData
+```
+
 #### Run Test To Write Token Data To Registry (Fuzz Test)
 
 ```shell
-$ forge test --mt testWriteTokenData
+$ forge test --mt testFuzz_writeTokenData
 ```
 
 

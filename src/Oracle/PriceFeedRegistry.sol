@@ -3,9 +3,19 @@ pragma solidity 0.8.26;
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
+/**
+ * @title PriceFeedRegistry
+ * @dev A library for retrieving price feed contract addresses based on token symbols.
+ */
 library PriceFeedRegistry {
     using Strings for string;
 
+    /**
+     * @notice Retrieves the price feed address for a given base token symbol.
+     * @dev Uses a hardcoded mapping of token symbols to price feed addresses.
+     * @param baseTokenSymbol The symbol of the token (e.g., "ETH", "BTC", "USDC").
+     * @return priceFeedAddress The corresponding price feed contract address.
+     */
     function getPriceFeedAddress(string memory baseTokenSymbol) internal pure returns (address priceFeedAddress) {
         if (baseTokenSymbol.equal("COMP")) {
             priceFeedAddress = 0x6726C678feE07B25BBE67bC720728652E4129369;

@@ -9,7 +9,7 @@ contract PriceFeedRegistryTest is Test {
 
     function setUp() public {}
 
-    function testGetPriceFeedAddress() public pure {
+    function test_getPriceFeedAddress() public pure {
         string memory baseTokenSymbol = "SCR";
         assertEq(baseTokenSymbol.getPriceFeedAddress(), 0x26f6F7C468EE309115d19Aa2055db5A74F8cE7A5);
     }
