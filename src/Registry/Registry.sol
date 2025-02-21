@@ -2,13 +2,16 @@
 pragma solidity 0.8.26;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-
+import {PriceConverter} from "../../src/Oracle/PriceConverter.sol";
 /**
  * @title Registry
  * @dev A contract to store and manage token data across multiple stages and substages.
  *      It allows tracking of the latest stage and subStage for a given token.
  */
+
 contract Registry is Ownable {
+    using PriceConverter for string;
+
     /// @notice Structure to store token-related data.
     /// @param price The price of the token.
     /// @param totalSupply The total supply of the token.
@@ -36,15 +39,16 @@ contract Registry is Ownable {
     /**
      * @notice Writes token data for a given token, stage, and subStage.
      * @dev Updates the latest stage and subStage if the new values are greater.
-     * @param tokenSymbolHash The keccak256 hash of the token symbol.
+     * @param tokenSymbol The string representation of the token symbol.
      * @param stage The stage of the token.
      * @param subStage The subStage within the given stage.
      * @param tokenData The token data to be stored.
      */
-    function writeTokenData(bytes32 tokenSymbolHash, uint256 stage, uint256 subStage, TokenData memory tokenData)
+    function writeTokenData(string memory tokenSymbol, uint256 stage, uint256 subStage, TokenData memory tokenData)
         external
         onlyOwner
     {
+        bytes32 tokenSymbolHash = keccak256(bytes(tokenSymbol));
         tokenSymbolHashToStageToSubstageToTokenData[tokenSymbolHash][stage][subStage] = tokenData;
 
         // Update the latest stage if this stage is greater
@@ -76,20 +80,48 @@ contract Registry is Ownable {
 
     /**
      * @notice Retrieves the latest recorded stage for a given token symbol hash.
-     * @param tokenSymbolHash The keccak256 hash of the token symbol.
+     * @param tokenSymbol The string representation of the token symbol.
      * @return The latest stage number recorded for the given token.
      */
-    function getLatestStage(bytes32 tokenSymbolHash) external view returns (uint256) {
-        return latestStage[tokenSymbolHash];
+    function getLatestStage(string memory tokenSymbol) external view returns (uint256) {
+        return latestStage[keccak256(bytes(tokenSymbol))];
     }
 
     /**
      * @notice Retrieves the latest recorded subStage for a given token symbol hash and stage.
-     * @param tokenSymbolHash The keccak256 hash of the token symbol.
+     * @param tokenSymbol The string representation of the token symbol.
      * @param stage The stage number for which the latest subStage is requested.
      * @return The latest subStage number recorded for the given stage.
      */
-    function getLatestSubStage(bytes32 tokenSymbolHash, uint256 stage) external view returns (uint256) {
-        return latestSubStage[tokenSymbolHash][stage];
+    function getLatestSubStage(string memory tokenSymbol, uint256 stage) external view returns (uint256) {
+        return latestSubStage[keccak256(bytes(tokenSymbol))][stage];
+    }
+
+    /**
+     * @notice Retrieves the latest recorded price of a given token.
+     * @dev Fetches the price from the most recent stage and sub-stage recorded for the token.
+     * @param tokenSymbol The string representation of the token symbol.
+     * @return The latest price of the token.
+     */
+    function getLatestPriceOfToken(string memory tokenSymbol) public view returns (uint256) {
+        bytes32 tokenSymbolHash = keccak256(bytes(tokenSymbol));
+        return tokenSymbolHashToStageToSubstageToTokenData[tokenSymbolHash][latestStage[tokenSymbolHash]][latestSubStage[tokenSymbolHash][latestStage[tokenSymbolHash]]]
+            .price;
+    }
+
+    /**
+     * @notice Converts the latest price of a token into its value in a base token.
+     * @dev Uses the conversion rate of the base token to determine the equivalent value.
+     * @param tokenSymbol The symbol of the token to be priced.
+     * @param baseTokenSymbol The symbol of the base token used for conversion.
+     * @param baseTokenAmount The amount of the base token.
+     * @return The equivalent value of the token in the base token.
+     */
+    function getLatestPriceOfTokenInBaseToken(
+        string memory tokenSymbol,
+        string memory baseTokenSymbol,
+        uint256 baseTokenAmount
+    ) external view returns (uint256) {
+        return (baseTokenSymbol.getConversionRate(baseTokenAmount) * getLatestPriceOfToken(tokenSymbol)) / 1e18;
     }
 }
