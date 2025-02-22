@@ -27,25 +27,25 @@ export const NavLinks: NavlinksType[] = [
     subNav: [
       {
         name: "About FIBO",
-        href: "#",
+        href: "/fibonacci/aboutfibo",
         description: "The World's First Digital Commodity",
         icon: <FaGem className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
         name: "Institutional FIBO",
-        href: "#",
+        href: "/fibonacci/institutionalfibo",
         description: "FIBOX for Institutions",
         icon: <FaLandmark className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
         name: "Euler",
-        href: "#",
+        href: "/fibonacci/euler",
         description: "One Way Ticket to Freedom",
         icon: <FaCoins className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
         name: "Fundamental Dashboard",
-        href: "#",
+        href: "/fibonacci/fundamentaldashboard",
         description: "Custom metrics for your needs",
         icon: <FiBarChart2 className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
