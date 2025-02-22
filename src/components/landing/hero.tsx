@@ -17,11 +17,11 @@ export default function Hero() {
           </p>
         </div>
 
-        <div className="w-full ">
+        <div className="w-full h-[500px] md:h-[950px]">
           <Spline
             scene="https://prod.spline.design/o5E6X6Nm3OZxO-YT/scene.splinecode"
             onLoad={() => console.log("Spline scene loaded")}
-            className="mt-2 mx-auto w-full left-0 right-0 relative pointer-events-none"
+            className="mt-2 mx-auto w-full h-full left-0 right-0 relative pointer-events-none"
           />
         </div>
       </div>

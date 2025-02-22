@@ -12,7 +12,7 @@ export default function HowItWorks() {
                 What Makes EulerFi Different
             </h2>
             <div className="max-w-6xl mx-auto">
-                <div className="flex flex-col md:gap-20 gap-10 md:flex-row justify-between items-center h-full pt-6 md:pt-16 mx-auto px-4">
+                <div className="flex flex-col md:gap-20 gap-8 md:flex-row justify-between items-center h-full pt-6 md:pt-16 mx-auto px-4">
                     <div className="mr-auto place-self-center ">
                         <h1 className="mb-4 max-w-xl text-2xl md:text-4xl font-bold leading-none ">
                             Revolutionary Endogenous Stability Mechanism
