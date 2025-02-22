@@ -28,6 +28,8 @@ library Constants {
 
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    
     bytes32 public constant MULTISIG_ROLE = keccak256("MULTISIG_ROLE");
 
 

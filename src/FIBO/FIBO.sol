@@ -11,12 +11,12 @@ contract FIBO is ERC20, Ownable {
 
 ///////////////////////////////////////////////////////// Minting & Burning /////////////////////////////////////////////////////////
 
-    function mint(uint256 _amount) internal { 
+    function mint(uint256 _amount) internal onlyOwner() { 
         require(_amount > 0, InsufficientAmount(_amount));
         _mint(owner(), _amount);
     }
 
-    function burn(uint256 _amount) internal {
+    function burn(uint256 _amount) internal onlyOwner() {
         require(_amount > 0, InsufficientAmount(_amount));
         _burn(owner(), _amount);
     }

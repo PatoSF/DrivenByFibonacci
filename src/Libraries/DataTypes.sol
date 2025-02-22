@@ -15,17 +15,24 @@ library DataTypes {
     }
 
     struct Substage {
+        uint SubstageNumber;
         uint256 PriceIncrease;  // Price increase per substage
         uint256 SupplyIncrease;  // Supply increase per substage
     }
 
     struct TokenListing {
-        uint256 listingId;
-        address owner; //we don't need this because it will be stored inside listings mappings.
-        address tokenAddress; // N   Do you really think that we need this ? The address will always be the FIBO address.
+        //uint256 listingId; //N I had to comment the listingId because I need to put the correct require statement in updatebalance
         uint256 amount;
+        address holder;
+        //uint256 Listingtime
         address desiredToken; // The token user wants in exchange
         // N we should record at which stage and substage the holder decided to list.
         // N In the Market contract we will do the same thing, we will record when his tokens were sold.
+    }
+
+    enum ListingStatus {
+        Pending,
+        Filled,
+        Cancelled
     }
 }
