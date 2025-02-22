@@ -1,4 +1,5 @@
 import About from "@/components/landing/About";
+import FAQs from "@/components/landing/FAQs";
 import Features from "@/components/landing/Features";
 import Hero from "@/components/landing/hero";
 import HowItWorks from "@/components/landing/HowItWorks";
@@ -14,6 +15,7 @@ export default function Home() {
       <About />
       <HowItWorks />
       <Features />
+      <FAQs />
     </main>
   )
 }
