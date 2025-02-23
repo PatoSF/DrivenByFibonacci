@@ -199,8 +199,9 @@ contract FiboVault is ERC4626, ERC20, AccessControl {
             s
         );
 
+        
         // Transfer tokens to contract
-        IERC20(token).transferFrom(msg.sender, address(this), amount);
+        //IERC20(token).transferFrom(msg.sender, address(this), amount);
 
         // Store listing
         listingCounter++;

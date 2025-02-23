@@ -5,7 +5,6 @@ import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
-import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import {DataTypes} from "../Libraries/DataTypes.sol";
 import {Events} from "../Libraries/Events.sol";
 /**
@@ -14,6 +13,8 @@ import {Events} from "../Libraries/Events.sol";
 * @notice Standard ERC4626 vault with minting and burning capabilities
 */
 contract FiboVault is ERC4626 {
+
+////////////////////////////////////////////////////////// Variables //////////////////////////////////////////////////////////
     uint256 public listingCounter;
     //stage incremented by setStage
     uint256 public stage;
@@ -22,7 +23,33 @@ contract FiboVault is ERC4626 {
     uint256 public substage;
     uint256 public maxsubstage;
     uint256 public price;
+    //address[] public ScrollAccessibleTokens; //Tokens accessible for users to swap for FIBO
 
+    mapping (address => bool) public ScrollAccessibleTokens; //Tokens accessible for users to swap for FIBO
+
+
+    /**
+     * @dev Adds an array of tokens to the list of tokens accessible for users to swap for FIBO
+     */
+    function addScrollToken (address[] memory tokens) external onlyRole(PROTOCOL_ROLE) {
+        for (uint256 i = 0; i < tokens.length; i++) {
+            ScrollAccessibleTokens[tokens[i]] = true;
+        }
+    }
+    /**
+     * @dev Adds a token to the list of tokens accessible for users to swap for FIBO
+     */
+    function addScrollToken (address tokens) external onlyRole(PROTOCOL_ROLE) {
+        ScrollAccessibleTokens[tokens] = true;
+        
+    }
+
+    /**
+     * @dev Checks if a token is accessible for users to swap for FIBO
+     */
+    function checkScrollTokens (address token) external view returns (bool) {
+        return ScrollAccessibleTokens[token];
+    }
 ////////////////////////////////////////////////////////// Mappings //////////////////////////////////////////////////////////
     /**
     * @notice Tracks stage Information
@@ -54,15 +81,12 @@ contract FiboVault is ERC4626 {
 
     }
 
-
-
-
     /**
     * @notice Advances the stage, enforcing a 365-day delay.
     * @dev Only callable by EXECUTOR_ROLE.
     */
     function setStage() external onlyRole(EXECUTOR_ROLE) returns(uint256) {
-        //N Add a require statement to check if 365 days has passed this the last call
+        //N Add a require statement to check if 365 days has passed this the last call so we need a timelock
         stage += 1;
         return stage;
         //N use emit instead of return 
@@ -71,6 +95,11 @@ contract FiboVault is ERC4626 {
     /**
     * @notice Updates the number of substages before transitioning to a new stage.
     * @dev Must be set before moving to the next stage.
+    */
+    /**
+    //call the DAO contract to retrieve the number of substages and set it inside the contract in the mapping.
+    //we should also keep track of the current substage.
+    // Set the stages, substages info inside the registry
     */
     function setSubstage() external onlyRole(EXECUTOR_ROLE) returns(uint256) { 
         require(maxsubstage >= substage, "Substage must be maximum maxsubstage");
@@ -149,10 +178,59 @@ contract FiboVault is ERC4626 {
 
 //////////////////////////////////////////////////////////// List Tokens ///////////////////////////////////////////////////////////
 
+    /**
+     * @dev Lists tokens on the market
+     * @param _amount The amount of FIBO tokens being listed.
+     * @param _desiredTokens The address of the tokens being exchanged
+     */
+    function listTokens(uint256 _amount, address[] _desiredTokens) public {
+        require(_amount > 0, "Amount to list should be greater than 0");
+        require(balances[msg.sender] >= _amount, "Not enough balance");
+        listingCounter++;
+        listingCounter.listings[listingCounter] = DataTypes.TokenListing({
+            amount : _amount,
+            holder : msg.sender,
+            desiredTokens : _desiredToken,
+            status : ListingStatus.Pending
+        });
+        emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
+    }
 
-
-
+    /**
+     * @notice When a Token listing is canceled inside listings,
+     *         the listing detailed all become zero
+     * @dev Remove a token from listings
+     * @param listingId The Id of the listing
+     */
+    function removeListing(uint256 listingId) external {
+        TokenListing storage listing = listings[listingId];
+        require(msg.sender == listing.owner, "Only owner can remove listing");
+        require(listing.amount > 0, "Listing does not exist");
+        listingCounter.listings[listingCounter] = DataTypes.TokenListing({
+            amount : 0,
+            holder : delete holder,
+            desiredTokens : delete desiredTokens,
+            status : ListingStatus.Canceled
+        });
+        emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
+    }
 ////////////////////////////////////////////////////////// View Funtions //////////////////////////////////////////////////////////
+
+
+
+    /**
+     * @dev Returns the name of the token.
+     */
+    function name() public view override returns (string memory) {
+        return name();
+    }
+
+    /**
+     * @dev Returns the symbol of the token, usually a shorter version of the name.
+     */
+    function symbol() public view override returns (string memory) {
+        return symbol();
+    }
 
     /**
      * @dev Returns the address of the underlying token used for the Vault for accounting, depositing, and withdrawing.
@@ -172,19 +250,19 @@ contract FiboVault is ERC4626 {
      * - MUST NOT revert.
      */
     function totalAssets() public view override returns (uint256) {
-        return _asset.balanceOf(address(this));
+        return totalAssets();
+
     }
 
     /**
      * @notice Override the balanceOf function from the ERC20 contract
-     * @dev Should retrieve the balance of each user
+     * @dev Retrieves the balance of a holder
      * @param account address of the FIBO holder
      * @return the balance of FIBO for an address
      */
     function holderBalance(address account) public view returns (uint256) {
         return balances[account];
     }
-
 
     /**
      * @dev Returns information about one listing
@@ -242,6 +320,18 @@ When a buyer wants to buy FIBO tokens in exchange for $SCR :
      If Noir wants to buy 800 tokens, he will buy it from Bob. Since bob was the first to list,
      he will be the first to sell. But if the buyer wants 1500 tokens, he will buy the first 1000 tokens from Bob and rest from Alice.
      Alice will have 1500 tokens left that she can sell.
+*/
+
+
+/** 
+* @notice When minting or burning tokens, we need to use a token distribution mechanism to distribute the tokens proportionally.
+          We will need to create a function for them to call to see how many tokens they got from a stage to another and from
+          a substage to another. 
+* @notice We will also need to create a funtion that calculates their total balance * the price of the FIBO so they can get
+          the total worth of their balance.
+* @notice If they want to list their tokens for sale : If they decide to sell all their tokens, they will choose "List All" button
+          on the frontend so we will a boolean or uint2 (if its 1 that means sell all or else its 0 that means they will specify 
+          the amount) they want to sell.
 */
 
     
