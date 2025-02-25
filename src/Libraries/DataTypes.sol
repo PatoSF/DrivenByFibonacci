@@ -24,7 +24,6 @@ library DataTypes {
         //uint256 listingId; //N I had to comment the listingId because I need to put the correct require statement in updatebalance
         uint256 amount;
         address holder;
-        //uint256 Listingtime
         address desiredToken[]; // The token user wants in exchange
         ListingStatus status;
         // N we should record at which stage and substage the holder decided to list.

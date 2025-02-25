@@ -5,15 +5,17 @@ import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
+import {Euler} from "../Tokens/Euler.sol";
 import {DataTypes} from "../Libraries/DataTypes.sol";
 import {Events} from "../Libraries/Events.sol";
+import {Errors} from "../Libraries/Errors.sol";
 /**
 * @title FIBO Vault 
 * @author Team EulerFi
 * @notice Standard ERC4626 vault with minting and burning capabilities
 */
-contract FiboVault is ERC4626 {
-
+contract FiboVault is ERC4626, Euler {
+    IERC20 public Euler;
 ////////////////////////////////////////////////////////// Variables //////////////////////////////////////////////////////////
     uint256 public listingCounter;
     //stage incremented by setStage
@@ -27,29 +29,6 @@ contract FiboVault is ERC4626 {
 
     mapping (address => bool) public ScrollAccessibleTokens; //Tokens accessible for users to swap for FIBO
 
-
-    /**
-     * @dev Adds an array of tokens to the list of tokens accessible for users to swap for FIBO
-     */
-    function addScrollToken (address[] memory tokens) external onlyRole(PROTOCOL_ROLE) {
-        for (uint256 i = 0; i < tokens.length; i++) {
-            ScrollAccessibleTokens[tokens[i]] = true;
-        }
-    }
-    /**
-     * @dev Adds a token to the list of tokens accessible for users to swap for FIBO
-     */
-    function addScrollToken (address tokens) external onlyRole(PROTOCOL_ROLE) {
-        ScrollAccessibleTokens[tokens] = true;
-        
-    }
-
-    /**
-     * @dev Checks if a token is accessible for users to swap for FIBO
-     */
-    function checkScrollTokens (address token) external view returns (bool) {
-        return ScrollAccessibleTokens[token];
-    }
 ////////////////////////////////////////////////////////// Mappings //////////////////////////////////////////////////////////
     /**
     * @notice Tracks stage Information
@@ -77,8 +56,8 @@ contract FiboVault is ERC4626 {
     // because I optimized the updatebalance function so it can get the owner of a listing from the struct.
     // mapping(address => mapping(uint256 => DataTypes.TokenListing[])) public listings;
 
-    constructor(IERC20 _asset) ERC4626(_asset) { 
-
+    constructor(IERC20 _asset, IERC20 _Euler) ERC4626(_asset) { 
+        Euler = _Euler;
     }
 
     /**
@@ -86,10 +65,10 @@ contract FiboVault is ERC4626 {
     * @dev Only callable by EXECUTOR_ROLE.
     */
     function setStage() external onlyRole(EXECUTOR_ROLE) returns(uint256) {
-        //N Add a require statement to check if 365 days has passed this the last call so we need a timelock
+        //Todo Add a require statement to check if 365 days has passed this the last call so we need a timelock
         stage += 1;
         return stage;
-        //N use emit instead of return 
+        //Todo use emit instead of return 
     }
 
     /**
@@ -103,7 +82,7 @@ contract FiboVault is ERC4626 {
     */
     function setSubstage() external onlyRole(EXECUTOR_ROLE) returns(uint256) { 
         require(maxsubstage >= substage, "Substage must be maximum maxsubstage");
-         //N Add a require statement to check if the duration since the start of the previous
+         //Todo Add a require statement to check if the duration since the start of the previous
          // substage has passed or at the start of the Stage.
         if (currentstage < stage) {
             currentstage = stage;
@@ -122,7 +101,8 @@ contract FiboVault is ERC4626 {
     function setPrice(uint256 newPrice) external onlyRole(EXECUTOR_ROLE) returns (uint256) {
         require(newPrice > price, "New price must be higher");
         require(substage > 0, "Substage must be greater than zero"); // Added to avoid 0 check for substage
-        price = newPrice / substage; //N apply multiplication to account for rounding errors maybe 10e18 idk
+        //Todo We need to check the stage and substage 
+        price = newPrice / substage; //Todo apply multiplication to account for rounding errors maybe 10e18 idk
         return price;
     }
 
@@ -133,20 +113,35 @@ contract FiboVault is ERC4626 {
     * @notice Mints new tokens at the beginning of each substage.
     * @dev Can only be called internally by governance functions.
     */
-    function mint(uint256 amount) internal onlyRole(MINTER_ROLE) {
-        //N We need to put restrictions that will not allow MINTER_ROLE to mint more or less tokens in each substage
-        //N We need to also check if substage period so he cannot mint before a substage or mint multiple times in a single substage
+    function mint(uint256 _amount) internal onlyRole(MINTER_ROLE) {
+        require(_amount > 0, "Amount to burn should be greater than 0");
         uint256 prevSupply = totalAssets();
-        _mint(address(this), amount);
+        //Todo We need to put restrictions that will not allow MINTER_ROLE to mint more or less tokens in each substage
+        //Todo We need to also check if substage period so he cannot mint before a substage or mint multiple times in a single substage
+        uint256 prevSupply = totalAssets();
+        _mint(address(this), _amount);
         require(totalAssets() > prevSupply, "Minting failed: Supply did not increase");
     }
 
     /**
-    * @notice Burns tokens, callable only by the protocol via MULTISIG_ROLE.
+    * @dev Burns tokens, callable only by the protocol via MULTISIG_ROLE.
+    * @param amount The amount of tokens to be burned.
     */
-    function burn(uint256 amount) external onlyRole(MULTISIG_ROLE) {
-        require(amount > 0, "Amount to burn should be greater than 0");
-        _burn(address(this), amount);
+    function burn(uint256 _amount) external onlyRole(MULTISIG_ROLE) {
+        require(_amount > 0, "Amount to burn should be greater than 0");
+        _burn(address(this), _amount);
+    }
+
+    /**
+    * @dev Mints FIBO tokens for the Euler 
+    * @param _amount The amount of FIBO tokens being minted
+    */
+    function mintFIBO4Euler(uint256 _amount) public {
+        //Todo We need to add a timelock restriction so holder can swap their tokens at the beginning of each stage.
+        require(_amount > 0, "Amount to burn should be greater than 0");
+        Euler.burn(_amount);
+        _mint(address(this), _amount);
+        balance[msg.sender] += _amount;
     }
 
 ////////////////////////////////////////////////////////// Update Balance /////////////////////////////////////////////////////////
@@ -172,7 +167,7 @@ contract FiboVault is ERC4626 {
         require(amount >= _amount, "Holder doent have enough tokens to sell");
         balances[currentHolder] -= _amount;
         balances[newHolder] += _amount;
-        //N clear the tokens in the tokenlistings
+        //Todo clear the tokens in the tokenlistings
         return _amount;
     }
 
@@ -214,53 +209,32 @@ contract FiboVault is ERC4626 {
         });
         emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
     }
+
+    /**
+     * @dev Adds an array of tokens to the list of tokens accessible for users to swap for FIBO
+     */
+    function addScrollTokens (address[] memory tokens) external onlyRole(PROTOCOL_ROLE) {
+        for (uint256 i = 0; i < tokens.length; i++) {
+            ScrollAccessibleTokens[tokens[i]] = true;
+        }
+    }
+
 ////////////////////////////////////////////////////////// View Funtions //////////////////////////////////////////////////////////
 
-
-
     /**
-     * @dev Returns the name of the token.
+     * @dev Checks if a token is accessible for users to swap for FIBO
      */
-    function name() public view override returns (string memory) {
-        return name();
+    function checkScrollTokens (address token) external view returns (bool) {
+        return ScrollAccessibleTokens[token];
     }
-
-    /**
-     * @dev Returns the symbol of the token, usually a shorter version of the name.
-     */
-    function symbol() public view override returns (string memory) {
-        return symbol();
-    }
-
-    /**
-     * @dev Returns the address of the underlying token used for the Vault for accounting, depositing, and withdrawing.
-     *
-     * - MUST be an ERC-20 token contract.
-     * - MUST NOT revert.
-     */
-    function asset() public view override returns (address) {
-        return address(_asset);
-    }
-
-    /**
-     * @dev Returns the total amount of the underlying asset that is “managed” by Vault.
-     *
-     * - SHOULD include any compounding that occurs from yield.
-     * - MUST be inclusive of any fees that are charged against assets in the Vault.
-     * - MUST NOT revert.
-     */
-    function totalAssets() public view override returns (uint256) {
-        return totalAssets();
-
-    }
-
+    
     /**
      * @notice Override the balanceOf function from the ERC20 contract
      * @dev Retrieves the balance of a holder
      * @param account address of the FIBO holder
      * @return the balance of FIBO for an address
      */
-    function holderBalance(address account) public view returns (uint256) {
+    function balanceOf(address account) public view override returns (uint256) {
         return balances[account];
     }
 
@@ -290,10 +264,6 @@ contract FiboVault is ERC4626 {
 }
 
 ////////////////////////////////////////////////////////// Comments //////////////////////////////////////////////////////////
-// Everytime the user lists his tokens -> he will update his dashboard 
-// Everytime a buyer buys his tokens -> he will update his dashboard
-
-
 
 // When a new buyer buys FIBO tokens they should wait a minimum amount before listing his tokens 
 // this will eliminate an MEV opportunities for quick money.
