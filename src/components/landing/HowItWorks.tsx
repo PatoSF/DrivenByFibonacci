@@ -7,7 +7,7 @@ import img3 from "../../../public/library.jpg";
 
 export default function HowItWorks() {
     return (
-        <div className="relative mx-auto font-inter bg-[#E6D2C0]  px-4 py-20 lg:py-24 md:min-h-screen overflow-hidden">
+        <div className="relative mx-auto font-inter bg-color0  px-4 py-20 lg:py-24 md:min-h-screen overflow-hidden">
             <h2 className="lg:text-5xl md:text-4xl text-3xl font-inter text-center font-bold mb-8 leading-snug text-color2  bg-clip-text ">
                 What Makes EulerFi Different
             </h2>
