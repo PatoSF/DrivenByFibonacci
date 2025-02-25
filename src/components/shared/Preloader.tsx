@@ -4,25 +4,31 @@ import React, { useState, useEffect } from "react";
 import Spline from "@splinetool/react-spline";
 
 const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(
+    typeof window !== "undefined" && !localStorage.getItem("preloaderShown") // Check localStorage
+  );
 
   useEffect(() => {
-    if (isLoading) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+    if (!isLoading) {
+      onLoadComplete();
+      return;
     }
+
+    document.body.style.overflow = "hidden";
 
     const timer = setTimeout(() => {
       setIsLoading(false);
-      if (onLoadComplete) onLoadComplete();
-    }, 12000);
+      localStorage.setItem("preloaderShown", "true"); // Store flag
+      onLoadComplete();
+    }, 12000); // Keep your preloader duration
 
     return () => {
       clearTimeout(timer);
       document.body.style.overflow = "unset";
     };
   }, [isLoading, onLoadComplete]);
+
+  if (!isLoading) return null; // Don't render if preloader has already been shown
 
   return (
     <div
@@ -33,12 +39,9 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
         bg-transparent
         transition-opacity duration-500 
         flex items-center justify-center
-        ${isLoading ? "opacity-100" : "opacity-0 pointer-events-none"}
+        opacity-100
       `}
-      style={{
-        minHeight: "100dvh",
-        minWidth: "100dvw",
-      }}
+      style={{ minHeight: "100dvh", minWidth: "100dvw" }}
     >
       <div className="w-screen h-screen relative">
         <Spline
@@ -58,6 +61,7 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
 };
 
 export default Preloader;
+
 
 
 // "use client";
