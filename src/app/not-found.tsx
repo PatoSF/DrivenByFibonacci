@@ -7,9 +7,9 @@ export default function NotFound() {
     const router = useRouter();
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-color1 p-4 relative">
+        <div className="w-full flex flex-col items-center justify-center min-h-screen bg-color1 p-4 fixed top-0 left-0 z-[999]">
             {/* 404 Icon */}
-            <TbError404 className="md:w-[300px] md:h-[300px] w-[200px] h-[200px] text-color2/80" />
+            <TbError404 className="md:w-[300px] md:h-[300px] w-[200px] h-[200px] text-color2" />
 
             {/* Heading */}
             <h1 className="text-center text-color2/90 font-sora font-bold lg:text-[52px] lg:leading-[52px] text-[36px] leading-[36px] tracking-tight lg:-mt-6 mb-4">
@@ -25,7 +25,7 @@ export default function NotFound() {
             <div className="w-full flex justify-center items-center gap-4 md:gap-8">
                 <Link
                     href="/"
-                    className="w-[150px] h-[45px] flex justify-center items-center rounded-lg bg-color5 text-white font-nunitoSans font-medium shadow-lg text-sm hover:bg-color2 transition"
+                    className="w-[150px] h-[45px] flex justify-center items-center rounded-lg bg-color2 text-white font-nunitoSans font-medium shadow-lg text-sm hover:bg-color5 transition"
                 >
                     Return Home
                 </Link>
