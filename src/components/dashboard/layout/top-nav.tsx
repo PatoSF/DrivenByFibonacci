@@ -1,8 +1,12 @@
 "use client";
+
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useScroll, motion, useSpring } from "framer-motion";
-import Logo from "./Logo";
+import Image from "next/image";
+import { CgArrowLongRight } from "react-icons/cg";
+import React from "react";
+import { cn } from "@/lib/utils";
+import { NavLinks, NavlinksType, SubNavType } from "@/utils/NavLinks";
+import MobileNav from "@/components/shared/MobileNav";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,36 +16,13 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import React from "react";
-import { cn } from "@/lib/utils";
-import { NavLinks, NavlinksType, SubNavType } from "@/utils/NavLinks";
-import MobileNav from "./MobileNav";
-import { CgArrowLongRight } from "react-icons/cg";
-import Image from "next/image";
+import ConnectButton from "@/components/shared/ConnectButton";
 
-export default function Nav() {
-  const { scrollYProgress } = useScroll();
-
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
+export default function TopNav() {
 
   return (
-    <header className="fixed top-0 inset-x-0 w-full z-50 bg-color1 bg-opacity-80 backdrop-blur-lg backdrop-filter">
-      <motion.div
-        className="fixed top-0 inset-x-0 bg-color5 origin-[0%] h-[6px] z-40"
-        style={{ scaleX }}
-      />
-      <nav className="w-full flex items-center justify-between py-3 px-8">
-        <Logo
-          classname="w-[45px] lg:w-[60px]"
-          image="/fibo-logo.png"
-          href="/"
-        />
-
-        {/* Navigation Links */}
+    <header className="w-full z-10 bg-color1 dark:bg-[#0F0F12] border-b border-gray-200 dark:border-[#1F1F23]">
+      <nav className="w-full flex items-center justify-end lg:justify-between py-3 px-4 sm:px-8">
         <main className="hidden lg:flex items-center">
           <NavigationMenu>
             <NavigationMenuList>
@@ -168,12 +149,9 @@ export default function Nav() {
           </NavigationMenu>
         </main>
 
-        <div className="flex items-center gap-[24px]">
-          <Link href="/dashboard">
-            <Button className="bg-color5 rounded-lg transition-all font-medium font-inter duration-200 hover:bg-color2 text-white">
-              Launch App
-            </Button>
-          </Link>
+        <div className="flex items-center justify-end gap-2 sm:gap-4">
+        <ConnectButton/>
+
           <div className="lg:hidden flex items-center">
             <MobileNav />
           </div>
