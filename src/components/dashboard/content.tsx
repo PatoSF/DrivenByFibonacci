@@ -1,4 +1,4 @@
-import CryptoCard from "./ChartCard";
+import CryptoCard from "./chartCard";
 import { token1, token2, token3 } from "@/utils/TokenData";
 import TokenDistribution from "./token-distribution";
 
