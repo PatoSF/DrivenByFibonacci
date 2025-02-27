@@ -8,7 +8,6 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
   const [fadeOutStarted, setFadeOutStarted] = useState(false);
 
   useEffect(() => {
-    // Check if preloader has already been shown in this session
     const hasPreloaderShown = sessionStorage.getItem("hasPreloaderShown");
 
     if (!hasPreloaderShown) {
@@ -32,11 +31,10 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
         document.body.style.overflow = "unset";
       };
     } else {
-      // Skip preloader and cleanup
       onLoadComplete();
       document.body.style.overflow = "unset";
     }
-  }, [onLoadComplete]); // Removed isLoading from dependencies since we only want this to run once
+  }, [onLoadComplete]);
 
   if (!isLoading) {
     return null;
