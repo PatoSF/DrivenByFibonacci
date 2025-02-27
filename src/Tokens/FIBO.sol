@@ -22,6 +22,10 @@ contract FIBO is ERC20, Ownable {
         _burn(owner(), _amount);
     }
 
+    function _update(address from, address to, uint256 value) internal override {
+        _update(from, to, value);    
+    }
+
 
 //////////////////////////////////////////////////////// Unauthorized Calls ///////////////////////////////////////////////////////
 

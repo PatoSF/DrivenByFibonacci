@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.27;
 
-import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "@openzeppelin/interfaces/IERC20.sol";
 import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
+import {FIBO} from "../Tokens/FIBO.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
-import {Euler} from "../Tokens/Euler.sol";
 import {DataTypes} from "../Libraries/DataTypes.sol";
 import {Events} from "../Libraries/Events.sol";
 import {Errors} from "../Libraries/Errors.sol";
@@ -14,78 +14,86 @@ import {Errors} from "../Libraries/Errors.sol";
 * @author Team EulerFi
 * @notice Standard ERC4626 vault with minting and burning capabilities
 */
-contract FiboVault is ERC4626, Euler {
-    IERC20 public Euler;
-////////////////////////////////////////////////////////// Variables //////////////////////////////////////////////////////////
-    uint256 public listingCounter;
-    //stage incremented by setStage
-    uint256 public stage;
-    //Used to check if stage is bigger than currentstage in setSubstage()
-    uint256 public currentstage;
-    uint256 public substage;
-    uint256 public maxsubstage;
-    uint256 public price;
-    //address[] public ScrollAccessibleTokens; //Tokens accessible for users to swap for FIBO
+contract FiboVault is ERC4626, Euler, FIBO {
 
-    mapping (address => bool) public ScrollAccessibleTokens; //Tokens accessible for users to swap for FIBO
+    // Stage Number
+    uint256 private stage;
+    // Substage Number
+    uint256 private substage;
+    // Max Substage per Stage
+    uint256 private maxSubstage;
+    // Total Price Increase
+    uint256 private price;
+    // Total Supply before minting
+    uint256 private artificialSupply;
+    // Substage Price Increase
+    uint232 private substagePrice;
+    // Substage Token Increase
+    uint256 private substageTokenIncrease;
+    // Previous Price
+    uint256 private previousPrice;
+    // New Price after each substage
+    uint256 private newPrice;
+    // New Total Supply after each substage
+    uint256 private newSupply;
+    // Previous Total Supply 
+    uint256 private previousTotalSupply;
+    // Previous Stage
+    uint256 private previousStage;
 
-////////////////////////////////////////////////////////// Mappings //////////////////////////////////////////////////////////
     /**
-    * @notice Tracks stage Information
-    * @dev Return a struct with total substages, substage duration, total price increase and total supply increase
-    */
-    mapping (uint256 => DataTypes.Stage[]) public StageInfo;
-
-    /**
-    * @notice Tracks substages Information
-    * @dev Return a struct with price increase and supply increase per substage
-    */
+     * @notice Tracks substages Information
+     * @dev Return a struct with price increase and supply increase per substage
+     */
     mapping (uint256 => mapping (uint256 => DataTypes.Substage)) public SubstageInfo;
 
-    /** 
-    * @dev Tracks user balances
-    */
-    mapping (address => uint256) public balance;
+    constructor(IERC20 _asset, uint256 _maxsubstage, uint256 _newprice, uint256 _newsupply) ERC4626(_asset) { 
+        initializeStage(_maxsubstage, _newprice, _newsupply);
+    }
+
+/////////////////////////////////////////////////// Setting Stage & Substage ///////////////////////////////////////////////////
 
     /**
-    * @notice Tracks token listings
-    * @dev Return a struct with token address and amount
-    */
-     mapping(uint256 => DataTypes.TokenListing[]) public listings;
-    //N The mapping was a double mapping but I changedd it to a single mapping that will take the listingId
-    // because I optimized the updatebalance function so it can get the owner of a listing from the struct.
-    // mapping(address => mapping(uint256 => DataTypes.TokenListing[])) public listings;
+     * @notice Only the INITIALIZE_ROLE can call 'initializeStage'
+     * @dev Initializes the stage and substage.
+     *
+     * Sets the new stage number and resets the substage number to 1.
+     * Sets the price, total supply of FIBO and the maximum number of substages in each stage.
+     * @param _maxsubstage The maximum number of substages per stage.
+     * @param _newprice The new price of FIBO.
+     * @param _newsupply The new supply of FIBO before minting.
+     */
+    function initializeStage(uint256 _maxsubstage, uint256 _newprice, uint256 _newsupply) public onlyRole(INITIALIZER_ROLE) {
+        //Todo Add TimeLock | 365 days
+        //Todo Restrict Executor access until DAO approval
+        setStage();
+        setMaxSubstage(_maxsubstage);
+        updateSubstage();
+        setPrice(_newprice);
+        setNewTokenSupply(_newsupply);
 
-    constructor(IERC20 _asset, IERC20 _Euler) ERC4626(_asset) { 
-        Euler = _Euler;
+        CalculateSubstageDuration();
+        CalculateSubstagePrice();
+        CalculateSubtageTokenIncrease();
+
+        updatePrice();
+        updateTokenSupply();
+
+        //Todo Add emmit event
     }
 
     /**
-    * @notice Advances the stage, enforcing a 365-day delay.
-    * @dev Only callable by EXECUTOR_ROLE.
-    */
-    function setStage() external onlyRole(EXECUTOR_ROLE) returns(uint256) {
-        //Todo Add a require statement to check if 365 days has passed this the last call so we need a timelock
-        stage += 1;
-        return stage;
-        //Todo use emit instead of return 
-    }
-
-    /**
-    * @notice Updates the number of substages before transitioning to a new stage.
-    * @dev Must be set before moving to the next stage.
-    */
-    /**
-    //call the DAO contract to retrieve the number of substages and set it inside the contract in the mapping.
-    //we should also keep track of the current substage.
-    // Set the stages, substages info inside the registry
-    */
-    function setSubstage() external onlyRole(EXECUTOR_ROLE) returns(uint256) { 
+     * @notice Resetting substages to 1 before going to a new stage.
+     * @dev Must be set before moving to the next stage.
+     */
+    function updateSubstage() external onlyRole(EXECUTOR_ROLE) returns(uint256) { 
         require(maxsubstage >= substage, "Substage must be maximum maxsubstage");
          //Todo Add a require statement to check if the duration since the start of the previous
          // substage has passed or at the start of the Stage.
-        if (currentstage < stage) {
-            currentstage = stage;
+         //Todo Add timelock | depending on substageDuration
+         //Todo Restrict Executor access until DAO approval
+        if (previousStage < stage) {   
+            previousStage = stage;
             substage = 1;
         }
         else {
@@ -94,214 +102,177 @@ contract FiboVault is ERC4626, Euler {
         return substage;
     }
 
-    /**
-    * @notice Updates the token price per substage.
-    * @dev Ensures the new price is greater than the previous price.
+    //Todo N maybe we will need to call this function inside the updatesubstage above so when we update to a new substage
+    // we can instantly mint and updateprice. 
+    function updateSubstageParam () public onlyRole(MINTER_ROLE) {
+        //Todo add timelock | depending on substageDuration
+        //Todo check the stage and substage to see if the executor can call this function
+        updatePrice();
+        updateTokenSupply();
+    }
+
+    /** 
+    * @notice When minting or burning tokens, we need to use a token distribution mechanism to distribute the tokens proportionally.
+            We will need to create a function for them to call to see how many tokens they got from a stage to another and from
+            a substage to another. 
+    * @notice We will also need to create a funtion that calculates their total balance * the price of the FIBO so they can get
+            the total worth of their balance.
+    * @notice If they want to list their tokens for sale : If they decide to sell all their tokens, they will choose "List All" button
+            on the frontend so we will a boolean or uint2 (if its 1 that means sell all or else its 0 that means they will specify 
+            the amount) they want to sell.
     */
-    function setPrice(uint256 newPrice) external onlyRole(EXECUTOR_ROLE) returns (uint256) {
-        require(newPrice > price, "New price must be higher");
-        require(substage > 0, "Substage must be greater than zero"); // Added to avoid 0 check for substage
-        //Todo We need to check the stage and substage 
-        price = newPrice / substage; //Todo apply multiplication to account for rounding errors maybe 10e18 idk
+    function getUserTokens() public {
+        //Todo add timelock | depending on substageDuration
+        getTokens(); //Todo getTokens should calculate the amount of tokens that the holder will receive at each substage
+        // we need to store user's data after each stage so we can calculate the amount of tokens that the user will receive at each substage
+        // He can call the function in every substage however if he decides to call it once at the each of all the substages 
+        // he will get all of his tokens. so we need to store the amount of tokens not yet transfered to see how many tokens he will receive
+        // from them by also considering the newly token supply minted. 
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////// Internal Functions //////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////// Setter Functions ///////////////////////////////////////////////////////////////
+    /**
+     * @dev Updates the current stage.
+     */
+    function setStage() internal returns(uint256) {
+        stage += 1;
+        return stage;
+    }
+
+    /**
+     * @dev Sets the maximum number of substages per stage
+     */
+    function setMaxSubstage(uint256 _maxsubstage) internal returns (uint256) {
+        maxsubstage = _maxsubstage;
+        return maxsubstage;
+    }
+
+    /**
+     * @dev Sets the new price of FIBO 
+     */
+    function setPrice(uint256 _price) internal returns (uint256) {
+        require(_price > price, "New price must be higher");
+        price = _price;
         return price;
     }
 
+    /**
+     * @dev Sets the new supply of FIBO before minting
+     */
+    function setNewTokenSupply (uint256 _newsupply) internal returns (uint256) { 
+        require(_newsupply > totalSupply(), "Amount to mint should be greater than current supply");
+        artificialSupply = _amount;
+        return artificialSupply;
+    }
 
-///////////////////////////////////////////////////////// Minting & Burning /////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////// Calculations /////////////////////////////////////////////////////////////////
+
+    function CalculateSubstagePrice() internal view returns(uint256) { 
+        // substagePrice = (price - previousprice) / substage;
+        //Todo apply multiplication to account for rounding errors 
+        return substagePrice;
+    }
+    function CalculateSubtageTokenIncrease() internal view returns(uint256) {
+        // substageTokenIncrease = (totalSupply() - previousTotalSupply) / substage;
+        //Todo apply multiplication to account for rounding errors
+        return substageTokenIncrease;
+    }
+
+    function CalculateSubstageDuration() internal view returns(uint256) {
+        // uint256 _substageDuration = 365 / maxSubstage;
+        //Todo apply multiplication to account for rounding errors
+        return substageDuration;
+    }
+
+/////////////////////////////////////////////////////////////// Update Functions ///////////////////////////////////////////////////////////////
 
     /**
-    * @notice Mints new tokens at the beginning of each substage.
-    * @dev Can only be called internally by governance functions.
-    */
-    function mint(uint256 _amount) internal onlyRole(MINTER_ROLE) {
+     * @dev Updates the token price per substage.
+     */
+    function updatePrice() internal returns (uint256) {
+        substage storage substageInfo = SubstageInfo[stage][substage];
+        substageInfo.priceIncrease = CalculateSubstagePrice();
+        newPrice = previousprice;
+        newPrice += substageInfo.priceIncrease;
+        return newprice;
+    }
+
+    /**
+     * @dev Updates the token supply per substage.
+     */
+    function updateTokenSupply() internal returns (uint256) {
+        substage storage substageInfo = SubstageInfo[stage][substage];
+        substageInfo.SupplyIncrease = CalculateSubtageTokenIncrease();
+        newSupply = previousTotalSupply;
+        newSupply += substageInfo.SupplyIncrease;
+        return newsupply;
+    }
+
+////////////////////////////////////////////////////////////// Minting & Burning ///////////////////////////////////////////////////////////////
+
+    /**
+     * @notice Mints new tokens at the beginning of each substage.
+     * @dev Can only be called internally by governance functions.
+     */
+    function mint(uint256 _amount) internal { 
         require(_amount > 0, "Amount to burn should be greater than 0");
         uint256 prevSupply = totalAssets();
-        //Todo We need to put restrictions that will not allow MINTER_ROLE to mint more or less tokens in each substage
-        //Todo We need to also check if substage period so he cannot mint before a substage or mint multiple times in a single substage
         uint256 prevSupply = totalAssets();
         _mint(address(this), _amount);
         require(totalAssets() > prevSupply, "Minting failed: Supply did not increase");
     }
 
     /**
-    * @dev Burns tokens, callable only by the protocol via MULTISIG_ROLE.
-    * @param amount The amount of tokens to be burned.
-    */
-    function burn(uint256 _amount) external onlyRole(MULTISIG_ROLE) {
+     * @dev Burns tokens, callable only by the protocol via MULTISIG_ROLE.
+     * @param amount The amount of tokens to be burned.
+     */
+    function burn(uint256 _amount) public onlyRole(MULTISIG_ROLE) {
         require(_amount > 0, "Amount to burn should be greater than 0");
         _burn(address(this), _amount);
     }
 
-    /**
-    * @dev Mints FIBO tokens for the Euler 
-    * @param _amount The amount of FIBO tokens being minted
-    */
-    function mintFIBO4Euler(uint256 _amount) public {
-        //Todo We need to add a timelock restriction so holder can swap their tokens at the beginning of each stage.
-        require(_amount > 0, "Amount to burn should be greater than 0");
-        Euler.burn(_amount);
-        _mint(address(this), _amount);
-        balance[msg.sender] += _amount;
-    }
-
-////////////////////////////////////////////////////////// Update Balance /////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////// Update Balance ////////////////////////////////////////////////////////////////
 
     /**
      * @dev Transfers balance from one holder to another.
-     * @param newHolder The new owner (aka buyer) of the balance.
+     * @param _newHolder The new owner (aka buyer) of the balance.
      * @param _amount The amount of FIBO tokens being exchanged.
      * @param _listingId The id of the listing
      * @return The amount of tokens that have been transferred
      */
-    function updateBalance(address newHolder, uint256 _amount, uint256 _listingId) internal returns (uint256) {
+    function updateBalance(address _newHolder, uint256 _amount, uint256 _listingId) internal returns (uint256) {
         address currentHolder = listings[_listingId].holder;
-        // currentHolder and newHolder cannot be the zero address
-        require(address(0) != (currentHolder && newHolder), "Cannot transfer to or from zero address");
-        // amount must be greater than 0
+        require(address(0) != (currentHolder && _newHolder), "Cannot transfer to or from zero address");
         require(_amount > 0, "Amount to transfer should be greater than 0");
-        // currentHolder cannot be the same as newHolder
-        require (currentHolder != newHolder, "Cannot transfer to yourself");
-        // The currentHolder must list his tokens on the market before calling the updateBalance
-        // and the seller can buy maximum the amount of tokens that the holder has listed
-        uint256 amount = listings[currentHolder][_listingId].amount;
-        require(amount >= _amount, "Holder doent have enough tokens to sell");
-        balances[currentHolder] -= _amount;
-        balances[newHolder] += _amount;
-        //Todo clear the tokens in the tokenlistings
+        require (currentHolder != _newHolder, "Cannot transfer to yourself");
+        require(listings[currentHolder][_listingId].amount >= _amount, "Holder doent have enough tokens to sell");
+        FIBO._update(msg.sender, _newHolder, _amount);
         return _amount;
     }
 
-//////////////////////////////////////////////////////////// List Tokens ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////// View Funtions /////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * @dev Lists tokens on the market
-     * @param _amount The amount of FIBO tokens being listed.
-     * @param _desiredTokens The address of the tokens being exchanged
-     */
-    function listTokens(uint256 _amount, address[] _desiredTokens) public {
-        require(_amount > 0, "Amount to list should be greater than 0");
-        require(balances[msg.sender] >= _amount, "Not enough balance");
-        listingCounter++;
-        listingCounter.listings[listingCounter] = DataTypes.TokenListing({
-            amount : _amount,
-            holder : msg.sender,
-            desiredTokens : _desiredToken,
-            status : ListingStatus.Pending
-        });
-        emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
+    function getStage() public view returns(uint256) {
+        return stage;
     }
-
-    /**
-     * @notice When a Token listing is canceled inside listings,
-     *         the listing detailed all become zero
-     * @dev Remove a token from listings
-     * @param listingId The Id of the listing
-     */
-    function removeListing(uint256 listingId) external {
-        TokenListing storage listing = listings[listingId];
-        require(msg.sender == listing.owner, "Only owner can remove listing");
-        require(listing.amount > 0, "Listing does not exist");
-        listingCounter.listings[listingCounter] = DataTypes.TokenListing({
-            amount : 0,
-            holder : delete holder,
-            desiredTokens : delete desiredTokens,
-            status : ListingStatus.Canceled
-        });
-        emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
+    function getSubstage() public view returns(uint256) {
+        return substage;
     }
-
-    /**
-     * @dev Adds an array of tokens to the list of tokens accessible for users to swap for FIBO
-     */
-    function addScrollTokens (address[] memory tokens) external onlyRole(PROTOCOL_ROLE) {
-        for (uint256 i = 0; i < tokens.length; i++) {
-            ScrollAccessibleTokens[tokens[i]] = true;
-        }
+    function getSubstagePrice() public view returns(uint256) {
+        return substagePrice; 
     }
-
-////////////////////////////////////////////////////////// View Funtions //////////////////////////////////////////////////////////
-
-    /**
-     * @dev Checks if a token is accessible for users to swap for FIBO
-     */
-    function checkScrollTokens (address token) external view returns (bool) {
-        return ScrollAccessibleTokens[token];
-    }
-    
-    /**
-     * @notice Override the balanceOf function from the ERC20 contract
-     * @dev Retrieves the balance of a holder
-     * @param account address of the FIBO holder
-     * @return the balance of FIBO for an address
-     */
-    function balanceOf(address account) public view override returns (uint256) {
-        return balances[account];
-    }
-
-    /**
-     * @dev Returns information about one listing
-     * @param _listingId Id of a specific listingS
-     * @return Returns a struct containing the holder, the amount and the desired tokens
-     */
-    function getListing(uint256 _listingId) public view returns (DataTypes.TokenListing memory) {
-        return listings[_listingId]; 
-    }
-
-    /**
-     * @dev Returns information about all the listings of a user
-     * @return Returns an array of structs containing the holder, the amount and the desired tokens
-     *
-     * It won't work since we changedd the listings to a single mapping. We can only put the listingId 
-     * to retrieve the information about it and the holder.
-     * Since we are updating the hodler's listing dashboard everytime he lists or cancels his listing token, we won't be needing this function
-     * Also we will update his dashboard everytime his tokens are sold. So we will have a enum : Pending, Sold, Canceled. He can filter 
-     * them in the frontend and hide the canceled ones if he wants to. (GO TO COMMENTS BELOW TO READ MORE ON THIS (Section 2))
-     */
-    // function getAllListings(address user) public view returns (DataTypes.TokenListing[] memory) {
-    //     return listings[user]; // Returns all listings
-    // }
+    function getSubstageTokenIncrease() public view returns(uint256) {
+        return substageTokenIncrease;
+    } 
 
 }
 
-////////////////////////////////////////////////////////// Comments //////////////////////////////////////////////////////////
-
-// When a new buyer buys FIBO tokens they should wait a minimum amount before listing his tokens 
-// this will eliminate an MEV opportunities for quick money.
-//N we need to implement this inside the listtokens function
 
 
-
-// currentHolder must have enough balance
-//require(balance[currentHolder] >= _amount, "Not enough balance");
-//We need to check the currentHolder's balance before he can list his tokens
-// So we can see if he has enough balance to list his tokens
-
-/**
-Section 2 
-We will need to create a priority system using a FIFO (First in First out) approach
-example : 
-Bob has listed 1000 tokens on 1 January.
-Alice has listed 2000 tokens on 5 January.
-Tony has listed 500 tokens on 9 January.
-
-When a buyer wants to buy FIBO tokens in exchange for $SCR :
-     He will use the filter on the dashboard to see which FIBO tokens are available for sale in exchange for $SCR.
-     We will display all the Holders who are interested in getting $SCR for their FIBO tokens.
-     If Noir wants to buy 800 tokens, he will buy it from Bob. Since bob was the first to list,
-     he will be the first to sell. But if the buyer wants 1500 tokens, he will buy the first 1000 tokens from Bob and rest from Alice.
-     Alice will have 1500 tokens left that she can sell.
-*/
-
-
-/** 
-* @notice When minting or burning tokens, we need to use a token distribution mechanism to distribute the tokens proportionally.
-          We will need to create a function for them to call to see how many tokens they got from a stage to another and from
-          a substage to another. 
-* @notice We will also need to create a funtion that calculates their total balance * the price of the FIBO so they can get
-          the total worth of their balance.
-* @notice If they want to list their tokens for sale : If they decide to sell all their tokens, they will choose "List All" button
-          on the frontend so we will a boolean or uint2 (if its 1 that means sell all or else its 0 that means they will specify 
-          the amount) they want to sell.
-*/
-
-    
