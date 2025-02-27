@@ -4,7 +4,7 @@ import React from 'react'
 
 const About = () => {
     return (
-        <section className="w-full pb-28 bg-color1 grid md:grid-cols-2 gap-4 lg:gap-10 lg:px-16 px-4">
+        <section className="w-full pb-20 bg-color1 grid md:grid-cols-2 gap-4 lg:gap-10 lg:px-16 px-4">
             <div className="w-full">
                 <div className="w-full">
                     <Image src="/cryptoportfolio.svg" alt="coins" className="w-full" width={500} height={500} quality={100} priority />

@@ -4,7 +4,7 @@ import React from 'react'
 
 const AboutFiboHero = () => {
     return (
-        <section className="w-full py-28 bg-color1 grid md:grid-cols-2 gap-4 lg:px-20 px-4">
+        <section className="w-full py-16 bg-color1 grid md:grid-cols-2 gap-4 lg:px-20 px-4">
             <div className="flex flex-col md:order-1 order-2 items-start justify-center">
                 <h3 className="text-color5 text-base uppercase font-marcellus font-bold tracking-wider mb-2">About FIBO</h3>
                 <h1 className="text-color2 md:text-6xl text-4xl font-inter font-bold">The World&apos;s First Digital Commodity</h1>

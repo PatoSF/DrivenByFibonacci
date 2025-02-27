@@ -57,25 +57,25 @@ export const NavLinks: NavlinksType[] = [
     subNav: [
       {
         name: "About Equilibrium",
-        href: "#",
+        href: "/equilibrium/aboutequilibrium",
         description: "The Power of Diversification",
         icon: <FaBalanceScale className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
         name: "Collateral Monitoring",
-        href: "#",
+        href: "/equilibrium/collateralmonitoring",
         description: "Real-time monitoring of collateral",
         icon: <MdMonitor className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
         name: "Community Perks",
-        href: "#",
+        href: "/equilibrium/communityperks",
         description: "Minting $EQLB with $FIBO",
         icon: <FaGift className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
         name: "Equilibrium Analytics",
-        href: "#",
+        href: "/equilibrium/equilibriumanalytics",
         description: "Your Equilibrium Dashboard",
         icon: <RiBarChartFill className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
