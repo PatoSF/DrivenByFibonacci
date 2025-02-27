@@ -3,12 +3,14 @@ pragma solidity ^0.8.27;
 
 import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {DataTypes} from "../Libraries/DataTypes.sol";
-import {FIBOVault} from "../Interfaces/IFIBOVault.sol";
+import {IFIBOVault} from "../Interfaces/IFIBOVault.sol";
 import {Events} from "../Libraries/Events.sol";
 import {Errors} from "../Libraries/Errors.sol";
-import {PriceOracle} from "./Market.sol";
+import {PriceOracle} from "./PriceOracle.sol";
+import {Registry} from "./Registry.sol";
 
 contract Market is ERC20, PriceOracle {
+    Registry public registry;
     IFIBOVault public FIBOVault;
     uint256 public listingIdCounter;
 
@@ -25,6 +27,7 @@ contract Market is ERC20, PriceOracle {
 
     constructor(IFIBOVault _FIBOVault) {
         FIBOVault = _FIBOVault;
+        registry = new Registry(address(_FIBOVault));
     }
 
     /**
@@ -58,10 +61,10 @@ contract Market is ERC20, PriceOracle {
         listings[listingIdCounter] = DataTypes.TokenListing({
             amount: _amount,
             holder: msg.sender,
-            desiredTokens: _desiredToken,
-            status: ListingStatus.Pending
+            desiredTokens: _desiredTokens,
+            status: DataTypes.ListingStatus.Pending
         });
-        emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
+        emit Events.TokensListed(listingIdCounter, msg.sender, _amount, _desiredTokens);
     }
 
     /**
@@ -71,35 +74,35 @@ contract Market is ERC20, PriceOracle {
      * @param listingId The Id of the listing
      */
     function removeListing(uint256 listingId) external {
-        TokenListing storage listing = listings[listingId];
+        DataTypes.TokenListing storage listing = listings[listingId];
         require(msg.sender == listing.owner, "Only owner can remove listing");
         require(listing.amount > 0, "Listing does not exist");
         listing[listingId].amount = 0;
-        listing[listingId].holder = delete holder;
-        listing[listingId].desiredTokens = delete desiredTokens;
-        listing[listingId].status = ListingStatus.Canceled;
+        // listing[listingId].holder = delete holder;
+        // listing[listingId].desiredTokens = delete desiredTokens;
+        listing[listingId].status = DataTypes.ListingStatus.Canceled;
         // listing[listingId] = DataTypes.TokenListing({
         //     amount : 0,
         //     holder : delete holder,
         //     desiredTokens : delete desiredTokens,
         //     status : ListingStatus.Canceled
         // });
-        emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
+        // emit TokensListed(listingCounter, msg.sender, amount, desiredToken[]);
     }
 
     function BuyFIBO(uint256 _listingId, uint256 _amount, address _desiredTokens) external {
         // we need to add a splippage percentage and remove listingId
         //Todo Implement a data feed
         require(_amount > 0, "Amount to buy should be greater than 0");
-        require(listings[_listingId].status == ListingStatus.Pending, "Listing does not exist");
+        require(listings[_listingId].status == DataTypes.ListingStatus.Pending, "Listing does not exist");
         require(listings[_listingId].desiredTokens == _desiredTokens, "Listing does not exist");
         for (uint256 i = 0; i < listings[_listingId].desiredTokens.length; i++) {
             if (listings[_listingId].desiredTokens[i] == _desiredTokens) {
                 require(listings[_listingId].amount >= _amount, "Not enough balance");
-                balances[listings[_listingId].holder] -= _amount;
+                DataTypes.balances[listings[_listingId].holder] -= _amount;
                 listings[_listingId].amount -= _amount;
                 if (listings[_listingId].amount == 0) {
-                    listings[listingIdCounter] = DataTypes.TokenListing({status: ListingStatus.Filled});
+                    listings[listingIdCounter] = DataTypes.TokenListing({status: DataTypes.ListingStatus.Filled});
                 }
             }
             //Todo Emit each timme assets are
@@ -144,6 +147,56 @@ contract Market is ERC20, PriceOracle {
     // IERC20(_desiredTokens).transfer(listings[_listingId].holder, numberOfTokenExchanged);
     // balances[msg.sender] += numberOfTokenExchanged;
 
+    /**
+     * @notice Adds a new price feed for a given base token.
+     * @dev Only callable by accounts with the PROTOCOL_ROLE.
+     * @param baseTokenSymbol The symbol of the base token (e.g., ETH, BTC).
+     * @param baseTokenAddress The address of the base token contract.
+     * @param priceFeedAddress The address of the Chainlink price feed for the base token.
+     */
+    function addPriceFeed(string memory baseTokenSymbol, address baseTokenAddress, address priceFeedAddress)
+        public
+        override
+        onlyRole(PROTOCOL_ROLE)
+    {
+        super.addPriceFeed(baseTokenSymbol, baseTokenAddress, priceFeedAddress);
+    }
+
+    /**
+     * @notice Converts the latest price of a token into its value in a base token.
+     * @dev Uses the conversion rate of the base token to determine the equivalent value.
+     * @param tokenSymbol The symbol of the token to be priced. (e.g., FIBO)
+     * @param baseTokenSymbol The symbol of the base token used for conversion. (e.g., SCR)
+     * @param baseTokenAmount The amount of the base token.
+     * @return The equivalent value of the token in the base token.
+     */
+    function getLatestPriceOfTokenInBaseToken(
+        string memory tokenSymbol,
+        string memory baseTokenSymbol,
+        uint256 baseTokenAmount
+    ) internal view returns (uint256) {
+        return
+            (getConversionRate(baseTokenSymbol, baseTokenAmount) * registry.getLatestPriceOfToken(tokenSymbol)) / 1e18;
+    }
+
+    /**
+     * @notice Exchanges a specified amount of one token for another based on their latest price in USD.
+     * @dev Retrieves price data from the registry to compute the equivalent amount of the output token.
+     * @param tokenInSymbol The symbol of the input token to be exchanged.
+     * @param tokenOutSymbol The symbol of the output token to receive.
+     * @param tokenInAmount The amount of the input token to be exchanged.
+     */
+    function exchangeToken(string memory tokenInSymbol, string memory tokenOutSymbol, uint256 tokenInAmount) public {
+        uint256 tokenInPrice = getLatestPriceOfTokenInBaseToken(tokenInSymbol, baseTokenSymbol, tokenInAmount); // Price of FIBO in USD
+        uint256 tokenOutPrice = registry.getLatestPriceOfToken(tokenOutSymbol); // Price of SCR in USD
+
+        uint256 tokenOutAmount = (tokenInPrice * 1e18) / tokenOutPrice; // Amount of tokenOutSymbol (SCR) tokens received for tokenInAmount (amount of FIBO) of tokenInSymbol (FIBO)
+
+        IERC20(getBaseTokenAddress(tokenOutSymbol)).transfer(listings[_listingId].holder, tokenOutAmount);
+
+        // TODO: Implement logic to decrement the balance of tokenInSymbol (i.e., FIBO token)
+    }
+
     //Todo Later on after we finish implementing all the above, We need to loop
     // all of the next addresses that have the desiredtokens in case the user wants
     // more FIBO tokens and we need to filter them by listingtoken time.
@@ -161,9 +214,9 @@ contract Market is ERC20, PriceOracle {
 //N we need to implement this inside the listtokens function
 
 /**
- * Section 2 
+ * Section 2
  * We will need to create a priority system using a FIFO (First in First out) approach
- * example : 
+ * example :
  * Bob has listed 1000 tokens on 1 January.
  * Alice has listed 2000 tokens on 5 January.
  * Tony has listed 500 tokens on 9 January.
