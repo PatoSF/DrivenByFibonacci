@@ -1,172 +1,144 @@
-"use client"
+"use client";
 
-import type * as React from "react"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react"
+  BarChart2,
+  Building2,
+  Folder,
+  SidebarIcon,
+} from "lucide-react";
 
-import { NavMain } from "./nav-main"
-// import { NavProjects } from "./nav-projects"
-// import { NavUser } from "./nav-user"
-// import { TeamSwitcher } from "./team-switcher"
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
-import Logo from "@/components/shared/Logo"
+import { Home } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import Logo from "@/components/shared/Logo";
+import { RiCloseFill } from "react-icons/ri";
+import {
+  FaFacebook,
+  FaInstagram,
+  FaLinkedin,
+  FaTwitter,
+} from "react-icons/fa6";
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
+export default function Sidebar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  function handleNavigation() {
+    setIsMobileMenuOpen(false);
+  }
+
+  function NavItem({
+    href,
+    icon: Icon,
+    children,
+  }: {
+    href: string;
+    icon: any;
+    children: React.ReactNode;
+  }) {
+    return (
+      <Link
+        href={href}
+        onClick={handleNavigation}
+        className="flex items-center px-3 py-2 text-sm rounded-md transition-colors text-gray-600 hover:text-white hover:bg-color5"
+      >
+        <Icon className="h-4 w-4 mr-3 flex-shrink-0" />
+        {children}
+      </Link>
+    );
+  }
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-      <Logo classname="w-[45px] mb-4" image="/fibo-logo.png" href="/" />
-        {/* <TeamSwitcher teams={data.teams} /> */}
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
-      </SidebarContent>
-      <SidebarFooter>
-        {/* <NavUser user={data.user} /> */}
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
-  )
-}
+    <>
+      <div className="lg:hidden flex fixed  left-4 z-[70]">
+        <button
+          type="button"
+          className=" p-2"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <SidebarIcon className="w-6 h-6 text-gray-600" />
+        </button>
+        <Logo classname="w-[45px] p-1 m-2" image="/fibo-logo.png" href="/" />
+      </div>
+      <nav
+        className={`
+                fixed inset-y-0 left-0 z-[70] w-64 bg-color1  transform transition-transform duration-200 ease-in-out
+                lg:translate-x-0 lg:static lg:w-64 border-r border-gray-300
+                ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+            `}
+      >
+        <div className="h-full flex flex-col">
+          <div className="flex">
+            <button
+              type="button"
+              className="lg:hidden p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <RiCloseFill className="w-6 h-6 text-gray-600" />
+            </button>
+            <Logo
+              classname="w-[45px] p-1 m-2"
+              image="/fibo-logo.png"
+              href="/"
+            />
+          </div>
 
+          <div className="flex-1 overflow-y-auto py-4 px-4">
+            <div className="space-y-6">
+              <div>
+                <div className="px-3 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500 ">
+                  Overview
+                </div>
+                <div className="space-y-1">
+                  <NavItem href="#" icon={Home}>
+                    Dashboard
+                  </NavItem>
+                  <NavItem href="#" icon={BarChart2}>
+                    Analytics
+                  </NavItem>
+                  <NavItem href="#" icon={Building2}>
+                    Governance
+                  </NavItem>
+                  <NavItem href="#" icon={Folder}>
+                    Docs
+                  </NavItem>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="px-4 py-4 border-t border-gray-200">
+            <div className="flex justify-center space-x-4">
+              <Link href="#">
+                <span className="text-gray-600 hover:text-color5 transition-colors">
+                  <FaFacebook size={20} />
+                </span>
+              </Link>
+              <Link href="#">
+                <span className="text-gray-600 hover:text-color5 transition-colors">
+                  <FaTwitter size={20} />
+                </span>
+              </Link>
+              <Link href="#">
+                <span className="text-gray-600 hover:text-color5 transition-colors">
+                  <FaLinkedin size={20} />
+                </span>
+              </Link>
+              <Link href="#">
+                <span className="text-gray-600 hover:text-color5 transition-colors">
+                  <FaInstagram size={20} />
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[65] md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+    </>
+  );
+}
