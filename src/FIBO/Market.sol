@@ -99,7 +99,7 @@ contract Market is ERC20, PriceOracle {
         for (uint256 i = 0; i < listings[_listingId].desiredTokens.length; i++) {
             if (listings[_listingId].desiredTokens[i] == _desiredTokens) {
                 require(listings[_listingId].amount >= _amount, "Not enough balance");
-                DataTypes.balances[listings[_listingId].holder] -= _amount;
+                balances[listings[_listingId].holder] -= _amount;
                 listings[_listingId].amount -= _amount;
                 if (listings[_listingId].amount == 0) {
                     listings[listingIdCounter] = DataTypes.TokenListing({status: DataTypes.ListingStatus.Filled});
@@ -160,6 +160,7 @@ contract Market is ERC20, PriceOracle {
         onlyRole(PROTOCOL_ROLE)
     {
         super.addPriceFeed(baseTokenSymbol, baseTokenAddress, priceFeedAddress);
+        ScrollAccessibleTokens[baseTokenAddress] = true;
     }
 
     /**
@@ -182,19 +183,37 @@ contract Market is ERC20, PriceOracle {
     /**
      * @notice Exchanges a specified amount of one token for another based on their latest price in USD.
      * @dev Retrieves price data from the registry to compute the equivalent amount of the output token.
+     * @param _listingId Id of a specific listing
      * @param tokenInSymbol The symbol of the input token to be exchanged.
      * @param tokenOutSymbol The symbol of the output token to receive.
      * @param tokenInAmount The amount of the input token to be exchanged.
      */
-    function exchangeToken(string memory tokenInSymbol, string memory tokenOutSymbol, uint256 tokenInAmount) public {
+    function exchangeToken(
+        uint256 _listingId, // q should we calculate the _listingId on the basis of FIFO instead?
+        string memory tokenInSymbol,
+        string memory tokenOutSymbol,
+        uint256 tokenInAmount
+    ) public {
+        address tokenOutAddress = getBaseTokenAddress(tokenOutSymbol);
+
+        require(keccak256(bytes(tokenInSymbol)) == keccak256(bytes("FIBO")), "Token not supported");
+        require(ScrollAccessibleTokens[tokenOutAddress], "Token not supported");
+        require(FIBOVault.balances[msg.sender] >= tokenInAmount, "Not enough balance");
+
         uint256 tokenInPrice = getLatestPriceOfTokenInBaseToken(tokenInSymbol, baseTokenSymbol, tokenInAmount); // Price of FIBO in USD
         uint256 tokenOutPrice = registry.getLatestPriceOfToken(tokenOutSymbol); // Price of SCR in USD
 
         uint256 tokenOutAmount = (tokenInPrice * 1e18) / tokenOutPrice; // Amount of tokenOutSymbol (SCR) tokens received for tokenInAmount (amount of FIBO) of tokenInSymbol (FIBO)
 
-        IERC20(getBaseTokenAddress(tokenOutSymbol)).transfer(listings[_listingId].holder, tokenOutAmount);
+        require(balances[listings[_listingId].holder] >= tokenOutAmount, "Not enough balance");
+
+        balances[listings[_listingId].holder] -= tokenOutAmount;
+        balances[msg.sender] += tokenOutAmount;
 
         // TODO: Implement logic to decrement the balance of tokenInSymbol (i.e., FIBO token)
+        // FIBOVault.balances[msg.sender] -= tokenOutAmount; // Not possible to change the value of a variable of another contract
+
+        IERC20(tokenOutAddress).transfer(listings[_listingId].holder, tokenOutAmount);
     }
 
     //Todo Later on after we finish implementing all the above, We need to loop
