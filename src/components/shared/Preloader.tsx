@@ -4,45 +4,36 @@ import React, { useState, useEffect } from "react";
 import Spline from "@splinetool/react-spline";
 
 const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [fadeOutStarted, setFadeOutStarted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    document.body.style.overflow = "hidden";
-
-    const fadeOutTimer = setTimeout(() => {
-      setFadeOutStarted(true);
-    }, 8000);
-
-    const loadTimer = setTimeout(() => {
-      setIsLoading(false);
-      onLoadComplete();
+    if (isLoading) {
+      document.body.style.overflow = "hidden";
+    } else {
       document.body.style.overflow = "unset";
+    }
+
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      if (onLoadComplete) onLoadComplete();
     }, 12000);
 
     return () => {
-      clearTimeout(fadeOutTimer);
-      clearTimeout(loadTimer);
+      clearTimeout(timer);
       document.body.style.overflow = "unset";
     };
-  }, [onLoadComplete]);
-
-  if (!isLoading) {
-    return null;
-  }
+  }, [isLoading, onLoadComplete]);
 
   return (
     <div
       className={`
         fixed inset-0 
         w-screen h-screen 
-        z-[9999]
+        z-[9999] 
         bg-transparent
-        transition-opacity duration-1000 
+        transition-opacity duration-500 
         flex items-center justify-center
         ${isLoading ? "opacity-100" : "opacity-0 pointer-events-none"}
-        ${fadeOutStarted ? "opacity-75" : "opacity-100"}
       `}
       style={{
         minHeight: "100dvh",
@@ -57,8 +48,8 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
             width: "100%",
             height: "100%",
             position: "absolute",
-            top: 0,
-            left: 0,
+            top: "0",
+            left: "0",
           }}
         />
       </div>
