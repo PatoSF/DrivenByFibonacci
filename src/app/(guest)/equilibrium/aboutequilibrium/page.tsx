@@ -1,5 +1,6 @@
 import HeroSection from "@/components/equilibrium/about/HeroSection";
 import KeyBenefits from "@/components/equilibrium/about/KeyBenefits";
+import TabularAnalysis from "@/components/equilibrium/about/TabularAnalysis";
 import WhatIsEquil from "@/components/equilibrium/about/WhatIsEquil";
 
 export default function AboutEquilibrium() {
@@ -9,6 +10,7 @@ export default function AboutEquilibrium() {
             <HeroSection />
             <WhatIsEquil />
             <KeyBenefits />
+            <TabularAnalysis />
         </main>
     )
 }

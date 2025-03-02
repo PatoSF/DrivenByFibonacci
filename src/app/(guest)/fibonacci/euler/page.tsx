@@ -1,6 +1,6 @@
 import HowEulerWorks from "@/components/fibonacci/euler/HowEulerWorks";
-import TabularAnalysis from "@/components/fibonacci/euler/TabularAnalysis";
 import TopSection from "@/components/fibonacci/euler/TopSection";
+import Vision from "@/components/fibonacci/euler/Vision";
 
 
 export default function Euler() {
@@ -8,8 +8,8 @@ export default function Euler() {
     return (
         <main className="w-full">
             <TopSection />
+            <Vision />
             <HowEulerWorks />
-            <TabularAnalysis />
         </main>
     )
 }

@@ -17,8 +17,8 @@ const WhatIsFiboX = () => {
                     <div className="w-full grid lg:grid-cols-4 lg:gap-6 md:grid-cols-2 md:gap-10 gap-5">
                         {
                             institutionalFiboFeatures.map((item, index) => (
-                                <div key={index} className="rounded-xl flex flex-col items-start justify-start hover:shadow-xl text-color1">
-                                    <h1 className='font-marcellus font-extrabold text-7xl text-color1/5 mb-4'>0{index + 1}</h1>
+                                <div key={index} className="rounded-xl flex flex-col items-start justify-start hover:shadow-xl">
+                                    <h1 className='font-marcellus font-extrabold text-7xl text-color1/60 mb-4'>0{index + 1}</h1>
                                     <h3 className='text-color1 text-lg font-inter mb-1'>{item.title}</h3>
                                     <p className="text-color1/80 text-base font-nunitoSans font-light">{item.description}</p>
                                 </div>
