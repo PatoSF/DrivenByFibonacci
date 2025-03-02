@@ -8,32 +8,24 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
   const [fadeOutStarted, setFadeOutStarted] = useState(false);
 
   useEffect(() => {
-    const hasPreloaderShown = sessionStorage.getItem("hasPreloaderShown");
+    setIsLoading(true);
+    document.body.style.overflow = "hidden";
 
-    if (!hasPreloaderShown) {
-      setIsLoading(true);
+    const fadeOutTimer = setTimeout(() => {
+      setFadeOutStarted(true);
+    }, 8000);
 
-      document.body.style.overflow = isLoading ? "hidden" : "unset";
-
-      const fadeOutTimer = setTimeout(() => {
-        setFadeOutStarted(true);
-      }, 8000);
-
-      const loadTimer = setTimeout(() => {
-        setIsLoading(false);
-        sessionStorage.setItem("hasPreloaderShown", "true");
-        onLoadComplete();
-      }, 12000);
-
-      return () => {
-        clearTimeout(fadeOutTimer);
-        clearTimeout(loadTimer);
-        document.body.style.overflow = "unset";
-      };
-    } else {
+    const loadTimer = setTimeout(() => {
+      setIsLoading(false);
       onLoadComplete();
       document.body.style.overflow = "unset";
-    }
+    }, 12000);
+
+    return () => {
+      clearTimeout(fadeOutTimer);
+      clearTimeout(loadTimer);
+      document.body.style.overflow = "unset";
+    };
   }, [onLoadComplete]);
 
   if (!isLoading) {

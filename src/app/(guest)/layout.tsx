@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import Nav from "@/components/shared/NavBar";
-import ClientLayout from "./ClientLayout";
 import { getMetadata } from "@/utils/getMetadata";
 import MaxWrapper from "@/components/shared/MaxWrapper";
 import { Footer } from "@/components/shared/Footer";
@@ -20,16 +19,13 @@ export default function RootLayout({
       <body
         className={`antialiased bg-color1`}
       >
-        {/* ClientLayout handles the spline preloader */}
-        <ClientLayout>
-          <MaxWrapper>
-            <Nav />
-            <main className="w-full">
-              {children}
-            </main>
-            <Footer />
-          </MaxWrapper>
-        </ClientLayout>
+        <MaxWrapper>
+          <Nav />
+          <main className="w-full">
+            {children}
+          </main>
+          <Footer />
+        </MaxWrapper>
       </body>
     </html>
   );
