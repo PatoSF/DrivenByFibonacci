@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.27;
 
-import {IERC20} from "@openzeppelin/interfaces/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {FIBO} from "../Tokens/FIBO.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
@@ -9,13 +9,14 @@ import {TimelockController} from "@openzeppelin/contracts/governance/TimelockCon
 import {DataTypes} from "../Libraries/DataTypes.sol";
 import {Events} from "../Libraries/Events.sol";
 import {Errors} from "../Libraries/Errors.sol";
+importy {Registry} from "./Registry.sol";
 /**
 * @title FIBO Vault 
 * @author Team EulerFi
 * @notice Standard ERC4626 vault with minting and burning capabilities
 */
 contract FiboVault is ERC4626, Euler, FIBO {
-
+    Registry private registry;
     // Stage Number
     uint256 private stage;
     // Substage Number
@@ -79,7 +80,7 @@ contract FiboVault is ERC4626, Euler, FIBO {
         updatePrice();
         updateTokenSupply();
 
-        //Todo Add emmit event
+         emit Events.StageInitialized(stage, _maxsubstage, _newprice, _newsupply);
     }
 
     /**
@@ -88,8 +89,6 @@ contract FiboVault is ERC4626, Euler, FIBO {
      */
     function updateSubstage() external onlyRole(EXECUTOR_ROLE) returns(uint256) { 
         require(maxsubstage >= substage, "Substage must be maximum maxsubstage");
-         //Todo Add a require statement to check if the duration since the start of the previous
-         // substage has passed or at the start of the Stage.
          //Todo Add timelock | depending on substageDuration
          //Todo Restrict Executor access until DAO approval
         if (previousStage < stage) {   
@@ -99,17 +98,16 @@ contract FiboVault is ERC4626, Euler, FIBO {
         else {
             substage += 1;
         }
+        updatePrice();
+        updateTokenSupply();
+        registry.writeTokenData(name(), stage, substage, 
+        tokenSymbolHashToStageToSubstageToTokenData[keccak256(bytes(name()))][stage][substage].tokenData({
+            price: newPrice,
+            supply: totalSupply()
+        }));
         return substage;
     }
 
-    //Todo N maybe we will need to call this function inside the updatesubstage above so when we update to a new substage
-    // we can instantly mint and updateprice. 
-    function updateSubstageParam () public onlyRole(MINTER_ROLE) {
-        //Todo add timelock | depending on substageDuration
-        //Todo check the stage and substage to see if the executor can call this function
-        updatePrice();
-        updateTokenSupply();
-    }
 
     /** 
     * @notice When minting or burning tokens, we need to use a token distribution mechanism to distribute the tokens proportionally.
@@ -122,12 +120,35 @@ contract FiboVault is ERC4626, Euler, FIBO {
             the amount) they want to sell.
     */
     function getUserTokens() public {
+        // Add timelock | depending on substageDuration
+        require(block.timestamp >= substageDuration, "Cannot claim tokens before the required duration");
+        
+        uint256 userTokens = calculateUserTokens(msg.sender);
+        require(userTokens > 0, "No tokens to claim");
+        
+        userUnclaimedTokens[msg.sender] = 0; // Reset unclaimed tokens after claiming
+        
+        _transfer(address(this), msg.sender, userTokens); 
         //Todo add timelock | depending on substageDuration
         getTokens(); //Todo getTokens should calculate the amount of tokens that the holder will receive at each substage
         // we need to store user's data after each stage so we can calculate the amount of tokens that the user will receive at each substage
         // He can call the function in every substage however if he decides to call it once at the each of all the substages 
         // he will get all of his tokens. so we need to store the amount of tokens not yet transfered to see how many tokens he will receive
         // from them by also considering the newly token supply minted. 
+    }
+
+    /**
+     * @dev Calculates unclaimed user tokens.
+     */
+    function calculateUserTokens(address user) internal view returns (uint256) {
+        uint256 totalUnclaimed = userUnclaimedTokens[user];
+        
+        // Calculate tokens accumulated per substage
+        for (uint256 i = 1; i <= substage; i++) {
+            totalUnclaimed += SubstageInfo[stage][i].SupplyIncrease;
+        }
+        
+        return totalUnclaimed;
     }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,20 +193,20 @@ contract FiboVault is ERC4626, Euler, FIBO {
 
 ///////////////////////////////////////////////////////////////// Calculations /////////////////////////////////////////////////////////////////
 
-    function CalculateSubstagePrice() internal view returns(uint256) { 
-        // substagePrice = (price - previousprice) / substage;
+    function CalculateSubstagePrice() internal returns(uint256) { 
+        substagePrice = ((price - previousPrice)) / substage;
         //Todo apply multiplication to account for rounding errors 
         return substagePrice;
     }
-    function CalculateSubtageTokenIncrease() internal view returns(uint256) {
-        // substageTokenIncrease = (totalSupply() - previousTotalSupply) / substage;
+    function CalculateSubtageTokenIncrease() internal returns(uint256) {
+        substageTokenIncrease = ((artificialSupply - previousTotalSupply) * 1e18) / substage;
         //Todo apply multiplication to account for rounding errors
         return substageTokenIncrease;
     }
 
-    function CalculateSubstageDuration() internal view returns(uint256) {
-        // uint256 _substageDuration = 365 / maxSubstage;
-        //Todo apply multiplication to account for rounding errors
+    function CalculateSubstageDuration() internal returns(uint256) {
+        substageDuration = (365 days * 1e18) / maxSubstage;
+        //Todo We need to round down or down to the nearest value
         return substageDuration;
     }
 
@@ -274,5 +295,9 @@ contract FiboVault is ERC4626, Euler, FIBO {
 
 }
 
+//Store leftover tokens from the token distribution
+//The protocol can retrieve them later
+//We need to check if totalsupply - amountfor holders = amountstuck
+//This amount will be sent the protocol's balance where they can sell them 
 
-
+    

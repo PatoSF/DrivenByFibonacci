@@ -102,7 +102,13 @@ contract Registry is Ownable {
      */
     function getLatestPriceOfToken(string memory tokenSymbol) public view returns (uint256) {
         bytes32 tokenSymbolHash = keccak256(bytes(tokenSymbol));
+<<<<<<< HEAD
         return tokenSymbolHashToStageToSubstageToTokenData[tokenSymbolHash][latestStage[tokenSymbolHash]][latestSubStage[tokenSymbolHash][latestStage[tokenSymbolHash]]]
             .price;
     }
 }
+=======
+        return tokenSymbolHashToStageToSubstageToTokenData[tokenSymbolHash][latestStage[tokenSymbolHash]][latestSubStage[tokenSymbolHash][latestStage[tokenSymbolHash]]].price;
+    }
+}
+>>>>>>> 5e7ee18 (<commit_message>)

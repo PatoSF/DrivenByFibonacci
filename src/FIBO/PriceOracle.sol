@@ -80,4 +80,8 @@ abstract contract PriceOracle {
         uint256 quoteTokenAmount = (baseTokenPrice * baseTokenAmount) / 1e18;
         return quoteTokenAmount;
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 5e7ee18 (<commit_message>)
