@@ -70,7 +70,7 @@ export const NavLinks: NavlinksType[] = [
       {
         name: "Community Perks",
         href: "/equilibrium/communityperks",
-        description: "Minting $EQLB with $FIBO",
+        description: "Minting $EQBL with $FIBO",
         icon: <FaGift className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
       {
