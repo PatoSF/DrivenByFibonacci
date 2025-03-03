@@ -3,7 +3,6 @@ pragma solidity ^0.8.27;
 
 import {ERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {DataTypes} from "../Libraries/DataTypes.sol";
-import {IFIBOVault} from "../Interfaces/IFIBOVault.sol";
 import {Events} from "../Libraries/Events.sol";
 import {Errors} from "../Libraries/Errors.sol";
 import {PriceOracle} from "./PriceOracle.sol";
@@ -23,11 +22,7 @@ contract Market is ERC20, PriceOracle {
     /**
      * @dev Tokens accessible for users to swap for FIBO
      */
-<<<<<<< HEAD
-    mapping(address => bool) public ScrollAccessibleTokens;
-=======
     mapping(address => bool) private ScrollAccessibleTokens;
->>>>>>> 5e7ee18 (<commit_message>)
 
     constructor(IFIBOVault _FIBOVault) {
         FIBOVault = _FIBOVault;
@@ -42,7 +37,6 @@ contract Market is ERC20, PriceOracle {
      * @param tokenOutSymbol The symbol of the output token to receive.
      * @param tokenInAmount The amount of the input token to be exchanged.
      */
-<<<<<<< HEAD
     function addScrollTokens(address[] memory tokens) external onlyRole(PROTOCOL_ROLE) {
         for (uint256 i = 0; i < tokens.length; i++) {
             ScrollAccessibleTokens[tokens[i]] = true;
@@ -120,7 +114,6 @@ contract Market is ERC20, PriceOracle {
     }
 
     /**
-=======
     
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,15 +121,10 @@ contract Market is ERC20, PriceOracle {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
->>>>>>> 5e7ee18 (<commit_message>)
      * @dev Mints FIBO tokens for the Euler
      * @param _amount The amount of FIBO tokens being minted
      */
     function mintFIBO4Euler(uint256 _amount) public {
-<<<<<<< HEAD
-        //Todo Put it inside the market contract
-=======
->>>>>>> 5e7ee18 (<commit_message>)
         //Todo  We need to add a timelock restriction so holder can swap their tokens at the beginning of each stage.
         require(_amount > 0, "Amount to burn should be greater than 0");
         Euler.burn(_amount);
@@ -291,7 +279,6 @@ contract Market is ERC20, PriceOracle {
      * @param token The address of the token
      * @return True if the token is accessible, false otherwise
      */
-<<<<<<< HEAD
     function checkScrollTokens(address token) external view returns (bool) {
         return ScrollAccessibleTokens[token];
     }
@@ -382,9 +369,8 @@ contract Market is ERC20, PriceOracle {
     //Todo We need to create a priority system using a FIFO (First in First out) approach
     //Todo we also need to implement a way that if a user wants more tokens, it will iterate
     //     to the next available seller.
-}
 
-=======
+
     function checkScrollTokens(address token) public view returns (bool) {
         return ScrollAccessibleTokens[token];
     }
@@ -392,30 +378,13 @@ contract Market is ERC20, PriceOracle {
 }
 
 
->>>>>>> 5e7ee18 (<commit_message>)
 ////////////////////////////////////////////////////////// Comments //////////////////////////////////////////////////////////
 
 // When a new buyer buys FIBO tokens they should wait a minimum amount before listing his tokens
 // this will eliminate an MEV opportunities for quick money.
 //N we need to implement this inside the listtokens function
 
-<<<<<<< HEAD
-/**
- * Section 2
- * We will need to create a priority system using a FIFO (First in First out) approach
- * example :
- * Bob has listed 1000 tokens on 1 January.
- * Alice has listed 2000 tokens on 5 January.
- * Tony has listed 500 tokens on 9 January.
- *
- * When a buyer wants to buy FIBO tokens in exchange for $SCR :
- *      He will use the filter on the dashboard to see which FIBO tokens are available for sale in exchange for $SCR.
- *      We will display all the Holders who are interested in getting $SCR for their FIBO tokens.
- *      If Noir wants to buy 800 tokens, he will buy it from Bob. Since bob was the first to list,
- *      he will be the first to sell. But if the buyer wants 1500 tokens, he will buy the first 1000 tokens from Bob and rest from Alice.
- *      Alice will have 1500 tokens left that she can sell.
- */
-=======
+
 /*
 function exchangeToken(
         uint256 _listingId, // q should we calculate the _listingId on the basis of FIFO instead?
@@ -445,4 +414,3 @@ function exchangeToken(
         IERC20(tokenOutAddress).transfer(listings[_listingId].holder, tokenOutAmount);
     }
     */
->>>>>>> 5e7ee18 (<commit_message>)

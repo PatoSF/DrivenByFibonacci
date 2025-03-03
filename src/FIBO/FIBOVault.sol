@@ -94,7 +94,7 @@ contract FiboVault is ERC4626, FIBO {
      */
     function updateSubstage() public returns(uint256) { 
         //Todo Add onlyRole(EXECUTOR_ROLE)
-         //Todo Add timelock | depending on substageDuration
+        //Todo Add timelock | depending on substageDuration
          //Todo Restrict Executor access until DAO approval
         require(maxSubstage >= substage, "Substage must be maximum maxsubstage");
         if (previousStage < stage) {   
@@ -125,6 +125,15 @@ contract FiboVault is ERC4626, FIBO {
             on the frontend so we will a boolean or uint2 (if its 1 that means sell all or else its 0 that means they will specify 
             the amount) they want to sell.
     */
+
+    // we need to retrieve the balance of the user and the total token supply + the amount that will be minted
+    // 1000 tokens , total supply is 1,000,000 tokens,  100,000 new tokens -> the new total supply is 1,100,000 tokens 
+    // 0.001% of the total supply  
+    // (1000 * 100,000) / 1,000,000 = 100
+    // he will get 100 tokens from the 100,000 tokens minted
+    // we will need to account for rounding Errors
+    // minimumsubstageDuration = 1 month
+
     function getUserTokens() public {
         // Add timelock | depending on substageDuration
         require(block.timestamp >= substageDuration, "Cannot claim tokens before the required duration");
@@ -143,19 +152,6 @@ contract FiboVault is ERC4626, FIBO {
         // from them by also considering the newly token supply minted. 
     }
 
-    /**
-     * @dev Calculates unclaimed user tokens.
-     */
-    function calculateUserTokens(address user) internal view returns (uint256) {
-        uint256 totalUnclaimed = userUnclaimedTokens[user];
-        
-        // Calculate tokens accumulated per substage
-        for (uint256 i = 1; i <= substage; i++) {
-            totalUnclaimed += SubstageInfo[stage][i].SupplyIncrease;
-        }
-        
-        return totalUnclaimed;
-    }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////// Internal Functions //////////////////////////////////////////////////////////////
@@ -213,7 +209,7 @@ contract FiboVault is ERC4626, FIBO {
     function CalculateSubstageDuration() internal returns(uint256) {
         substageDuration = (365 days * 1e18) / maxSubstage;
         //Todo We need to round down or down to the nearest value
-        return substageDuration;ss
+        return substageDuration;
     }
 
 /////////////////////////////////////////////////////////////// Update Functions ///////////////////////////////////////////////////////////////
@@ -224,7 +220,7 @@ contract FiboVault is ERC4626, FIBO {
     function updatePrice() internal returns (uint256) {
         substage storage substageInfo = SubstageInfo[stage][substage];
         substageInfo.priceIncrease = CalculateSubstagePrice();
-        newPrice = previousPrice;
+        newPrice = previousPrice; //Todo previousPrice should be updated after each substage
         newPrice += substageInfo.priceIncrease;
         return newPrice;
     }
@@ -273,11 +269,11 @@ contract FiboVault is ERC4626, FIBO {
      * @return The amount of tokens that have been transferred
      */
     function updateBalance(address _newHolder, uint256 _amount, uint256 _listingId) internal returns (uint256) {
-        address currentHolder = listings[_listingId].holder;
+        address currentHolder = market.listings[_listingId].holder;
         require(address(0) != (currentHolder && _newHolder), "Cannot transfer to or from zero address");
         require(_amount > 0, "Amount to transfer should be greater than 0");
         require (currentHolder != _newHolder, "Cannot transfer to yourself");
-        require(listings[currentHolder][_listingId].amount >= _amount, "Holder doent have enough tokens to sell");
+        require(market.listings[currentHolder][_listingId].amount >= _amount, "Holder doent have enough tokens to sell");
         FIBO._update(msg.sender, _newHolder, _amount);
         return _amount;
     }
@@ -306,4 +302,16 @@ contract FiboVault is ERC4626, FIBO {
 //We need to check if totalsupply - amountfor holders = amountstuck
 //This amount will be sent the protocol's balance where they can sell them 
 
-    
+
+//Old supply was 800,000 tokens
+// new total supply is 1,000,000 // There is a 200,000 token increase
+// If all the holders called getusertokens() the 200,000 will be distributed across all the holders
+// After we round down all of the holders will receive 199,998.5 tokens
+
+// Bob should receive 100.5 tokens -> 100 | 0.5
+// Alice should receive 234.8 -> 234 | 0.8
+//Tony shoud receive 232.2 -> 232 | 0.2
+...
+// 0.5 + 0.8 + 0.2 = 100 tokens unassigned tokens that we will need to assign them to the protocol or admin 
+
+// 10 tokens will be accessible to the protocol
