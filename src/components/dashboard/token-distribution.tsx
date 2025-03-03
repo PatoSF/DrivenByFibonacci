@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Card } from "@/components/ui/card";
-import { piechartData } from "@/utils/TokenData"; 
+import { piechartData } from "@/utils/TokenData";
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({

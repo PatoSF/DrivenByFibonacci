@@ -150,7 +150,7 @@ export default function TopNav() {
         </main>
 
         <div className="flex items-center justify-end gap-2 sm:gap-4">
-        <ConnectButton/>
+          <ConnectButton />
 
           <div className="lg:hidden flex items-center">
             <MobileNav />

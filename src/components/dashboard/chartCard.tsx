@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -41,11 +42,11 @@ export default function CryptoCard({
   name,
   price,
   supply,
-  marketCap,
+  // marketCap,
   chartData,
   yAxisDomain,
   supplyLabel = "SUPPLY",
-  marketCapLabel = "MARKET CAP",
+  // marketCapLabel = "MARKET CAP",
 }: CryptoCardProps) {
   return (
     <Card className="rounded-2xl">
@@ -107,10 +108,9 @@ export default function CryptoCard({
                 tickLine={false}
                 tick={{ fill: "#6b7280" }}
                 tickFormatter={(value) =>
-                  `$${
-                    typeof value === "number" && value < 10
-                      ? value.toFixed(3)
-                      : value.toLocaleString()
+                  `$${typeof value === "number" && value < 10
+                    ? value.toFixed(3)
+                    : value.toLocaleString()
                   }`
                 }
                 tickCount={6}
