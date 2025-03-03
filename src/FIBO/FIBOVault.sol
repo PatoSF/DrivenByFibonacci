@@ -213,7 +213,7 @@ contract FiboVault is ERC4626, FIBO {
     function CalculateSubstageDuration() internal returns(uint256) {
         substageDuration = (365 days * 1e18) / maxSubstage;
         //Todo We need to round down or down to the nearest value
-        return substageDuration;
+        return substageDuration;ss
     }
 
 /////////////////////////////////////////////////////////////// Update Functions ///////////////////////////////////////////////////////////////
