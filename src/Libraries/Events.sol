@@ -11,7 +11,7 @@ library Events {
         uint256 indexed listingId,
         address indexed owner,
         uint256 amount,
-        address desiredToken[]
+        address[] desiredToken
     );
 
     event ListingRemoved(

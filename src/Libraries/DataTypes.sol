@@ -24,13 +24,13 @@ library DataTypes {
         //uint256 listingId; 
         uint256 amount;
         address holder;
-        address desiredToken[]; // The token user wants in exchange
+        address[] desiredToken; // The token user wants in exchange
         ListingStatus status; // Pending, Filled, Canceled
     }
 
     enum ListingStatus {
-        uint256 Pending,
-        uint256 Filled,
-        uint256 Canceled
+        Pending,
+        Filled,
+        Canceled
     }
 }

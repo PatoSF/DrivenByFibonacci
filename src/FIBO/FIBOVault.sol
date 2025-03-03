@@ -9,14 +9,16 @@ import {TimelockController} from "@openzeppelin/contracts/governance/TimelockCon
 import {DataTypes} from "../Libraries/DataTypes.sol";
 import {Events} from "../Libraries/Events.sol";
 import {Errors} from "../Libraries/Errors.sol";
-importy {Registry} from "./Registry.sol";
+import {Registry} from "./Registry.sol";
+import {Market} from "./Market.sol";
 /**
 * @title FIBO Vault 
 * @author Team EulerFi
 * @notice Standard ERC4626 vault with minting and burning capabilities
 */
-contract FiboVault is ERC4626, Euler, FIBO {
+contract FiboVault is ERC4626, FIBO {
     Registry private registry;
+    Market private market;
     // Stage Number
     uint256 private stage;
     // Substage Number
@@ -42,6 +44,8 @@ contract FiboVault is ERC4626, Euler, FIBO {
     // Previous Stage
     uint256 private previousStage;
 
+    uint256 private substageDuration;
+
     /**
      * @notice Tracks substages Information
      * @dev Return a struct with price increase and supply increase per substage
@@ -64,7 +68,8 @@ contract FiboVault is ERC4626, Euler, FIBO {
      * @param _newprice The new price of FIBO.
      * @param _newsupply The new supply of FIBO before minting.
      */
-    function initializeStage(uint256 _maxsubstage, uint256 _newprice, uint256 _newsupply) public onlyRole(INITIALIZER_ROLE) {
+    function initializeStage(uint256 _maxsubstage, uint256 _newprice, uint256 _newsupply) public {
+        //Todo Add onlyRole(INITIALIZER_ROLE)
         //Todo Add TimeLock | 365 days
         //Todo Restrict Executor access until DAO approval
         setStage();
@@ -87,10 +92,11 @@ contract FiboVault is ERC4626, Euler, FIBO {
      * @notice Resetting substages to 1 before going to a new stage.
      * @dev Must be set before moving to the next stage.
      */
-    function updateSubstage() external onlyRole(EXECUTOR_ROLE) returns(uint256) { 
-        require(maxsubstage >= substage, "Substage must be maximum maxsubstage");
+    function updateSubstage() public returns(uint256) { 
+        //Todo Add onlyRole(EXECUTOR_ROLE)
          //Todo Add timelock | depending on substageDuration
          //Todo Restrict Executor access until DAO approval
+        require(maxSubstage >= substage, "Substage must be maximum maxsubstage");
         if (previousStage < stage) {   
             previousStage = stage;
             substage = 1;
@@ -101,7 +107,7 @@ contract FiboVault is ERC4626, Euler, FIBO {
         updatePrice();
         updateTokenSupply();
         registry.writeTokenData(name(), stage, substage, 
-        tokenSymbolHashToStageToSubstageToTokenData[keccak256(bytes(name()))][stage][substage].tokenData({
+        registry.tokenSymbolHashToStageToSubstageToTokenData[keccak256(bytes(name()))][stage][substage].tokenData({
             price: newPrice,
             supply: totalSupply()
         }));
@@ -168,8 +174,8 @@ contract FiboVault is ERC4626, Euler, FIBO {
      * @dev Sets the maximum number of substages per stage
      */
     function setMaxSubstage(uint256 _maxsubstage) internal returns (uint256) {
-        maxsubstage = _maxsubstage;
-        return maxsubstage;
+        maxSubstage = _maxsubstage;
+        return maxSubstage;
     }
 
     /**
@@ -186,7 +192,7 @@ contract FiboVault is ERC4626, Euler, FIBO {
      */
     function setNewTokenSupply (uint256 _newsupply) internal returns (uint256) { 
         require(_newsupply > totalSupply(), "Amount to mint should be greater than current supply");
-        artificialSupply = _amount;
+        artificialSupply = _newsupply;
         return artificialSupply;
     }
 
@@ -218,9 +224,9 @@ contract FiboVault is ERC4626, Euler, FIBO {
     function updatePrice() internal returns (uint256) {
         substage storage substageInfo = SubstageInfo[stage][substage];
         substageInfo.priceIncrease = CalculateSubstagePrice();
-        newPrice = previousprice;
+        newPrice = previousPrice;
         newPrice += substageInfo.priceIncrease;
-        return newprice;
+        return newPrice;
     }
 
     /**
@@ -231,7 +237,7 @@ contract FiboVault is ERC4626, Euler, FIBO {
         substageInfo.SupplyIncrease = CalculateSubtageTokenIncrease();
         newSupply = previousTotalSupply;
         newSupply += substageInfo.SupplyIncrease;
-        return newsupply;
+        return newSupply;
     }
 
 ////////////////////////////////////////////////////////////// Minting & Burning ///////////////////////////////////////////////////////////////
@@ -242,17 +248,17 @@ contract FiboVault is ERC4626, Euler, FIBO {
      */
     function mint(uint256 _amount) internal { 
         require(_amount > 0, "Amount to burn should be greater than 0");
-        uint256 prevSupply = totalAssets();
-        uint256 prevSupply = totalAssets();
+        uint256 prevSup = totalAssets();
         _mint(address(this), _amount);
-        require(totalAssets() > prevSupply, "Minting failed: Supply did not increase");
+        require(totalAssets() > prevSup, "Minting failed: Supply did not increase");
     }
 
     /**
      * @dev Burns tokens, callable only by the protocol via MULTISIG_ROLE.
-     * @param amount The amount of tokens to be burned.
+     * @param _amount The amount of tokens to be burned.
      */
-    function burn(uint256 _amount) public onlyRole(MULTISIG_ROLE) {
+    function burn(uint256 _amount) public {
+        //Todo Add onlyRole(MULTISIG_ROLE)
         require(_amount > 0, "Amount to burn should be greater than 0");
         _burn(address(this), _amount);
     }
