@@ -165,7 +165,7 @@ export const NavLinks: NavlinksType[] = [
     subNav: [
       {
         name: "EulerFi Team",
-        href: "#",
+        href: "/team/eulerfi-team",
         description: "The people behind this masterpiece",
         icon: <MdPeople className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
