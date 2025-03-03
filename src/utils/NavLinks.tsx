@@ -117,7 +117,7 @@ export const NavLinks: NavlinksType[] = [
     subNav: [
       {
         name: "EulerFi's Insider Market",
-        href: "#",
+        href: "/market/eulerfi-market",
         description: "Trade with confidence",
         icon: <MdBusinessCenter className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
