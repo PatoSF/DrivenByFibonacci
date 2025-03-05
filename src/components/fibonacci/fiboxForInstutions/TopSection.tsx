@@ -6,7 +6,7 @@ const TopSection = () => {
     return (
         <section className='w-full pt-36 pb-28 bg-color1 lg:px-20 px-4'>
             <div className="max-w-3xl mx-auto flex flex-col text-center items-center justify-center">
-                <h1 className="text-color2 lg:text-[42px] lg:leading-[42px] md:text-4xl text-3xl font-inter font-bold">🏛 Institutional FIBO - Redefining Digital Assets for Institutions with FIBOX</h1>
+                <h1 className="text-color2 lg:text-[42px] lg:leading-[42px] md:text-4xl text-3xl font-inter font-bold">Institutional FIBO - Redefining Digital Assets for Institutions with FIBOX</h1>
                 <p className="text-color2/80 text-lg font-nunitoSans lg:px-10 font-light mt-2">Unlock institutional-grade financial solutions with FIBO, designed for stability, scalability, and long-term growth.</p>
                 <Button className="bg-color5 text-color1 hover:bg-color2 mt-4">Get FIBOX Now</Button>
             </div>
