@@ -102,10 +102,10 @@ export default function Sidebar() {
                   <NavItem href="/dashboard/swap" icon={ArrowRightLeft}>
                     Swap
                   </NavItem>
-                  <NavItem href="#" icon={ShoppingBag}>
+                  <NavItem href="/dashboard/buy" icon={ShoppingBag}>
                     Buy FIBO
                   </NavItem>
-                  <NavItem href="#" icon={ScanBarcode}>
+                  <NavItem href="/dashboard/mint" icon={ScanBarcode}>
                     Mint FIBO
                   </NavItem>
                 </div>

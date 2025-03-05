@@ -2,7 +2,7 @@
 
 import Sidebar from "@/components/dashboard/layout/sidebar";
 import TopNav from "@/components/dashboard/layout/top-nav";
-import SwapUI from "@/components/dashboard/swap";
+import Swap from "@/components/dashboard/swap";
 
 export default function Dashboard() {
     return (
@@ -14,7 +14,7 @@ export default function Dashboard() {
                 </header>
                 <main className="flex-1 overflow-auto px-6 md:p-0 xl:p-3 bg-color1">
                     {/* swap UI */}
-                    <SwapUI />
+                    <Swap />
                 </main>
             </div>
         </div>
