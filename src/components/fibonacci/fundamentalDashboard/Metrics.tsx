@@ -12,10 +12,10 @@ const Metrics = () => {
                         <thead className="bg-color2">
                             <tr className="text-left text-color1 font-marcellus">
                                 <th className="px-4 py-5">Metric</th>
-                                <th className="px-3 py-5">FIBO Value</th>
-                                <th className="px-3 py-5">FIBO % Change</th>
-                                <th className="px-3 py-5">EQBL Value</th>
-                                <th className="px-3 py-5">EQBL % Change</th>
+                                <th className="px-3 py-5">$FIBO</th>
+                                <th className="px-3 py-5">$FIBO</th>
+                                <th className="px-3 py-5">$EQBL</th>
+                                <th className="px-3 py-5">$EQBL</th>
                             </tr>
                         </thead>
                         <tbody className='text-sm font-nunitoSans'>
@@ -52,66 +52,66 @@ export default Metrics
 
 const coreFinancialMetrics = [
     {
-        metric: "Transactions (Yearly) 📊",
+        metric: "Transactions (Yearly)",
         fiboValue: "1,200,000",
-        fiboChange: "📈 +15.3%",
+        fiboChange: "+15.3%",
         eqblValue: "980,000",
-        eqblChange: "📈 +12.8%",
+        eqblChange: "+12.8%",
     },
     {
-        metric: "Transactions (Quarterly) 🔄",
+        metric: "Transactions (Quarterly)",
         fiboValue: "280,000",
-        fiboChange: "📈 +4.7%",
+        fiboChange: "+4.7%",
         eqblValue: "240,000",
-        eqblChange: "📈 +3.9%",
+        eqblChange: "+3.9%",
     },
     {
-        metric: "Transactions (Weekly) 🗓️",
+        metric: "Transactions (Weekly)",
         fiboValue: "22,500",
-        fiboChange: "📈 +2.1%",
+        fiboChange: "+2.1%",
         eqblValue: "19,000",
-        eqblChange: "📈 +1.8%",
+        eqblChange: "+1.8%",
     },
     {
-        metric: "Token Price ($USD) 💰",
+        metric: "Token Price ($USD)",
         fiboValue: "$3.42",
-        fiboChange: "📈 +6.8% MoM",
+        fiboChange: "+6.8% MoM",
         eqblValue: "$2.88",
-        eqblChange: "📈 +5.2% MoM",
+        eqblChange: "+5.2% MoM",
     },
     {
-        metric: "Market Cap ($M) 💲",
+        metric: "Market Cap ($M)",
         fiboValue: "750",
-        fiboChange: "📈 +9.1% QoQ",
+        fiboChange: "+9.1% QoQ",
         eqblValue: "620",
-        eqblChange: "📈 +7.5% QoQ",
+        eqblChange: "+7.5% QoQ",
     },
     {
-        metric: "TVL ($M) 📦",
+        metric: "TVL ($M)",
         fiboValue: "1,100",
-        fiboChange: "📈 +10.2%",
+        fiboChange: "+10.2%",
         eqblValue: "870",
-        eqblChange: "📈 +8.3%",
+        eqblChange: "+8.3%",
     },
     {
-        metric: "BuyFibo Transactions (MoM) 🛒",
-        fiboValue: "52,000",
-        fiboChange: "📈 +7.2%",
-        eqblValue: "—",
-        eqblChange: "-",
+        metric: "Total Transactions (MoM)",
+        fiboValue: "2,500,000",
+        fiboChange: "+7.2%",
+        eqblValue: "3,000,000",
+        eqblChange: "+8.2%",
     },
     {
-        metric: "Active Wallets (30D) 👛",
+        metric: "Active Wallets (30D)",
         fiboValue: "85,000",
-        fiboChange: "📈 +5.4%",
+        fiboChange: "+5.4%",
         eqblValue: "72,000",
-        eqblChange: "📈 +4.9%",
+        eqblChange: "+4.9%",
     },
     {
-        metric: "Liquidity Growth ($M) 🌊",
+        metric: "Liquidity Growth ($M)",
         fiboValue: "450",
-        fiboChange: "📈 +11.6%",
+        fiboChange: "+11.6%",
         eqblValue: "390",
-        eqblChange: "📈 +9.8%",
+        eqblChange: "+9.8%",
     },
 ];

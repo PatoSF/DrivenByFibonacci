@@ -1,7 +1,6 @@
 import React from 'react'
 import PriceBarChart from './BarChart'
 import LiquidationLineChart from './LineChart'
-import ProjectionPieChart from './PieChart'
 
 const Insight = () => {
     return (
@@ -16,10 +15,6 @@ const Insight = () => {
 
                 <div className="w-full">
                     <LiquidationLineChart />
-                </div>
-
-                <div className="w-full md:col-span-2 flex justify-center">
-                    <ProjectionPieChart />
                 </div>
             </main>
 

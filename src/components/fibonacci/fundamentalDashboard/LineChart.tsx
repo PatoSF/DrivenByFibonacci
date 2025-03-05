@@ -12,15 +12,15 @@ const liquidationData = [
 const LiquidationLineChart = () => {
     return (
         <div className="px-4 py-8 bg-color0">
-            <h2 className="text-xl font-nunitoSans font-semibold text-color2 text-center mb-4">Liquidation Trends</h2>
+            <h2 className="text-xl font-nunitoSans font-semibold text-color2 text-center mb-4">Purchasing Power</h2>
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={liquidationData}>
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="FIBO" stroke="#FF5722" />
-                    <Line type="monotone" dataKey="EQBL" stroke="#4CAF50" />
+                    <Line type="monotone" dataKey="FIBO" stroke="#CC4976" />
+                    <Line type="monotone" dataKey="EQBL" stroke="#7f316d" />
                 </LineChart>
             </ResponsiveContainer>
         </div>

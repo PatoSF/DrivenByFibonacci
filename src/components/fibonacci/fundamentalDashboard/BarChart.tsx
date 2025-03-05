@@ -13,7 +13,7 @@ const priceData = [
 const PriceBarChart = () => {
     return (
         <div className="px-4 font-nunitoSans py-8 bg-color0 ">
-            <h2 className="text-xl font-nunitoSans font-semibold text-color2 text-center mb-4">Price Trends (FIBO vs EQBL)</h2>
+            <h2 className="text-xl font-nunitoSans font-semibold text-color2 text-center mb-4">Total Supply ($FIBO vs $EQBL)</h2>
             <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={priceData}>
                     <XAxis dataKey="name" />
