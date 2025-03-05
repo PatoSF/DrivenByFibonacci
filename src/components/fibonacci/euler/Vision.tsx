@@ -25,7 +25,7 @@ const Vision = () => {
                     <div className="absolute aspect-square bg-[#FFBE7B] rounded-full blur-[122px] flex-none left-1/2 top-[37px] -translate-x-1/2 w-[85%]"></div>
                     <div className="relative">
                         <Image
-                            src="/palace.jpg"
+                            src="/1.webp"
                             alt="Image"
                             width={400}
                             height={400}
@@ -57,7 +57,7 @@ const Vision = () => {
                     <div className="absolute aspect-square bg-[#A07CFE] rounded-full blur-[122px] flex-none left-1/2 top-[37px] -translate-x-1/2 w-[85%]"></div>
                     <div className="relative">
                         <Image
-                            src="/Stairs.jpg"
+                            src="/2.webp"
                             alt="Image"
                             width={400}
                             height={400}
