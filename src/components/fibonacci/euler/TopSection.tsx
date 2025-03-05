@@ -9,7 +9,7 @@ const TopSection = () => {
                 <Image src="/euler.jpg" alt="banner" className="w-full h-full object-cover rounded-xl" width={1000} height={667} quality={100} priority />
             </div>
             <div className="max-w-3xl mx-auto mt-4 flex flex-col text-center items-center justify-center gap-3">
-                <h1 className="text-color2 lg:text-[42px] lg:leading-[42px] md:text-4xl text-3xl font-inter font-bold">✨ Euler - The Future of Algorithmic Stability</h1>
+                <h1 className="text-color2 lg:text-[42px] lg:leading-[42px] md:text-4xl text-3xl font-inter font-bold">Euler - The Future of Algorithmic Stability</h1>
                 <p className="text-color2/80 text-lg font-nunitoSans lg:px-10 font-light">A mathematically optimized stable asset designed for institutions, investors, and DeFi innovators seeking financial autonomy.</p>
                 <Button className="bg-color5 text-color1 hover:bg-color2 ">Discover Euler</Button>
             </div>
