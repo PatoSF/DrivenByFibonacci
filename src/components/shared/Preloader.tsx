@@ -34,7 +34,7 @@ const Preloader = ({ onLoadComplete }: { onLoadComplete: () => void }) => {
       onLoadComplete();
       document.body.style.overflow = "unset";
     }
-  }, [onLoadComplete]);
+  }, [onLoadComplete, isLoading]);
 
   if (!isLoading) {
     return null;
