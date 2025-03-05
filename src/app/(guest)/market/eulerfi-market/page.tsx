@@ -1,10 +1,12 @@
-import EulerFiSwapMarket from "@/components/market/EulerFiMarket";
+import HeroSection from "@/components/market/EulerFiMarket/HeroSection";
+import MarketOverview from "@/components/market/EulerFiMarket/Overview";
 
 export default function EulerFiMarket() {
 
     return (
         <main className="w-full">
-            <EulerFiSwapMarket />
+            <HeroSection />
+            <MarketOverview />
         </main>
     )
 }
