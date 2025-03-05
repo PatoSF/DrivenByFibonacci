@@ -1,5 +1,8 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react'
+import { FaLinkedinIn } from 'react-icons/fa6';
+import { RiTwitterXFill } from 'react-icons/ri';
 
 const OurTeam = () => {
     return (
@@ -15,6 +18,14 @@ const OurTeam = () => {
                             <Image src={item.image} alt='teammember' className='object-cover rounded-md' quality={100} priority width={244} height={244} />
                             <h2 className='text-center font-nunitoSans mt-2 text-lg font-semibold'>{item.name}</h2>
                             <h4 className='text-center font-marcellus text-sm'>{item.role}</h4>
+                            <div className="flex justify-center items-center gap-2 mt-4">
+                                <Link href={item.twitter} className="text-color2 hover:text-color5 p-1 border-[0.5px] border-color2 hover:border-color5 rounded-md text-lg" target="_blank">
+                                    <RiTwitterXFill />
+                                </Link>
+                                <Link href={item.linkedin} className="text-color2 hover:text-color5 p-1 border-[0.5px] border-color2 hover:border-color5 rounded text-lg" target="_blank">
+                                    <FaLinkedinIn />
+                                </Link>
+                            </div>
                         </div>
                     ))
                 }
@@ -31,25 +42,21 @@ const teamMembers = [
         name: "Patrick Seir",
         role: "Lead Protocol Engineer",
         image: "/team/signor.jpeg",
+        twitter: "https://x.com/patrick__sfeir",
+        linkedin: "https://www.linkedin.com/in/patrick-sfeir-353260174/"
     },
     {
-        name: "OxYogi",
-        role: "DeFi Researcher",
-        image: "/team/signor.jpeg",
-    },
-    {
-        name: "Syed Asad",
+        name: "Jeffrey Owoloko",
         role: "Blockchain Developer",
         image: "/team/signor.jpeg",
+        twitter: "https://x.com/thebadmandev",
+        linkedin: "https://www.linkedin.com/in/jeffrey-owoloko/"
     },
     {
-        name: "Jeffrey",
-        role: "Blockchain Developer",
-        image: "/team/signor.jpeg",
-    },
-    {
-        name: "Emmanuel",
+        name: "Emmanuel Omemgboji",
         role: "Web3 Developer",
         image: "/team/signor.jpeg",
+        twitter: "https://x.com/OneSignor",
+        linkedin: "https://www.linkedin.com/in/emmanuel-omemgboji-4b92b3140/"
     },
 ];
