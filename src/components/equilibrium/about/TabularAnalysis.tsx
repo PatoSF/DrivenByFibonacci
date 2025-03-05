@@ -2,15 +2,15 @@ import React from 'react'
 
 const TabularAnalysis = () => {
     return (
-        <section className="w-full bg-color1 md:py-28 py-20 px-4 md:px-0">
-            <h1 className="text-color2 md:text-4xl lg:mb-8 mb-10 text-3xl text-center font-inter font-bold">Euler vs. Traditional Stablecoins</h1>
+        <section className="w-full bg-color1 md:pb-28 pb-20 px-4 md:px-0">
+            <h1 className="text-color2 md:text-4xl lg:mb-8 mb-10 text-3xl text-center font-inter font-bold">$EQBL vs. Traditional Stablecoins</h1>
             <main className='max-w-5xl mx-auto'>
                 <div className="overflow-x-auto w-full">
                     <table className="min-w-full text-base">
                         <thead className="bg-color2">
                             <tr className="text-left text-color1 font-marcellus">
                                 <th className="px-4 py-5">Feature</th>
-                                <th className="px-3 py-5">EulerFi</th>
+                                <th className="px-3 py-5">EQBL</th>
                                 <th className="px-3 py-5">Centralized Stablecoins</th>
                                 <th className="px-3 py-5">Algorithmic Stablecoins</th>
                             </tr>
@@ -55,37 +55,37 @@ type EulerVsStablecoinsTypes = {
 
 const eulerVsStablecoins: EulerVsStablecoinsTypes[] = [
     {
-        feature: "Decentralization 🌐",
+        feature: "Decentralization",
         euler: "✅ Fully decentralized",
         centralizedStablecoins: "❌ Centralized reserves",
         algorithmicStablecoins: "✅ Algorithmic",
     },
     {
-        feature: "Mathematically Backed 📈",
+        feature: "Mathematically Backed",
         euler: "✅ Yes, based on financial models",
         centralizedStablecoins: "❌ No",
         algorithmicStablecoins: "✅ Yes, but unstable",
     },
     {
-        feature: "Liquidity & Market Access 💱",
+        feature: "Liquidity & Market Access",
         euler: "✅ Global & seamless",
         centralizedStablecoins: "❌ Limited accessibility",
         algorithmicStablecoins: "✅ Moderate",
     },
     {
-        feature: "Censorship Resistance 🚀",
+        feature: "Censorship Resistance",
         euler: "✅ Yes, fully permissionless",
         centralizedStablecoins: "❌ No",
         algorithmicStablecoins: "✅ Yes",
     },
     {
-        feature: "Scalability 📊",
+        feature: "Scalability",
         euler: "✅ High, adaptive supply",
         centralizedStablecoins: "❌ Limited reserves",
         algorithmicStablecoins: "✅ Moderate",
     },
     {
-        feature: "Peg Stability ⚖️",
+        feature: "Peg Stability",
         euler: "✅ Strong market mechanisms",
         centralizedStablecoins: "✅ Fiat-backed",
         algorithmicStablecoins: "❌ Historically weak",

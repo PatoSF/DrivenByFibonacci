@@ -12,7 +12,7 @@ const HeroSection = () => {
             </div>
             <div className="w-full md:order-2 order-1">
                 <div className="w-full">
-                    <Image src="/equilibrium.png" alt="equilibrium" className="w-full" width={500} height={500} quality={100} priority />
+                    <Image src="/equilibrium.png" alt="equilibrium" className="w-full" width={2000} height={2000} quality={100} priority />
                 </div>
             </div>
         </section>

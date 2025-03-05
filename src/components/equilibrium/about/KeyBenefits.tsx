@@ -6,7 +6,7 @@ const KeyBenefits = () => {
 
             <div className="w-full flex flex-col items-center md:gap-20 gap-10">
                 <h2 className="text-color2 md:text-4xl text-3xl font-inter font-semibold">Key Benefits</h2>
-                <div className="w-full flex md:flex-row flex-col md:flex-wrap items-center justify-center md:gap-10 gap-5">
+                <div className="max-w-6xl flex md:flex-row flex-col md:flex-wrap items-center justify-center md:gap-10 gap-5">
                     {
                         listOfKeyBenefits.map((item, index) => (
                             <div key={index} className="rounded-xl flex flex-col items-start justify-start bg-[#E6D2C0] max-w-[330px] hover:shadow-xl p-6 cursor-pointer group hover:bg-color2 transition-all duration-300">
