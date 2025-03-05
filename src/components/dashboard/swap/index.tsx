@@ -21,7 +21,7 @@ const SwapUI = () => {
     };
 
     return (
-        <section className="w-full min-h-screen flex justify-center items-center bg-[#fff9f4] text-[#191221]">
+        <section className="w-full flex justify-center pt-20 md:pt-28 items-center bg-[#fff9f4] text-[#191221]">
             <main className="max-w-xl w-full p-6 bg-[#ffefe4] rounded-lg shadow-md">
                 <h1 className="md:text-2xl text-xl font-inter text-center font-bold mb-4">Swap</h1>
 

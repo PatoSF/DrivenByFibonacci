@@ -31,7 +31,7 @@ const ListingTable = () => {
                 </TableHeader>
                 <TableBody>
                     {listingTableData.map((item, i) => (
-                        <TableRow key={i} className="font-light font-nunitoSans border-b border-opacity-10 border-color2 ">
+                        <TableRow key={i} className="font-nunitoSans border-b border-opacity-10 border-color2 ">
                             <TableCell>{addressFormatter(item.address)}</TableCell>
                             <TableCell>{item.listingId}</TableCell>
                             <TableCell>{item.amount}</TableCell>

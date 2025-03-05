@@ -15,7 +15,7 @@ export default function PreloaderLayout({
         <>
             <Preloader onLoadComplete={() => setLoading(false)} />
             <div
-                className={`min-h-screen w-full transition-opacity duration-500 
+                className={`min-h-screen w-full transition-opacity bg-color1 duration-500 
                 ${loading ? "opacity-0" : "opacity-100"} 
                 `}
             >
