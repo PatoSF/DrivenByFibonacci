@@ -2,10 +2,12 @@
 "use client";
 
 import {
-  BarChart2,
-  Building2,
-  Folder,
   SidebarIcon,
+  BadgePlus,
+  BadgeMinus,
+  ArrowRightLeft,
+  ShoppingBag,
+  ScanBarcode
 } from "lucide-react";
 
 import { Home } from "lucide-react";
@@ -14,8 +16,6 @@ import { useState } from "react";
 import Logo from "@/components/shared/Logo";
 import { RiCloseFill } from "react-icons/ri";
 import {
-  FaFacebook,
-  FaInstagram,
   FaLinkedin,
   FaTwitter,
 } from "react-icons/fa6";
@@ -90,17 +90,23 @@ export default function Sidebar() {
                   Overview
                 </div>
                 <div className="space-y-1">
-                  <NavItem href="#" icon={Home}>
+                  <NavItem href="/dashboard" icon={Home}>
                     Dashboard
                   </NavItem>
-                  <NavItem href="#" icon={BarChart2}>
-                    Analytics
+                  <NavItem href="#" icon={BadgePlus}>
+                    Add Listings
                   </NavItem>
-                  <NavItem href="#" icon={Building2}>
-                    Governance
+                  <NavItem href="#" icon={BadgeMinus}>
+                    Remove Listings
                   </NavItem>
-                  <NavItem href="#" icon={Folder}>
-                    Docs
+                  <NavItem href="/dashboard/swap" icon={ArrowRightLeft}>
+                    Swap
+                  </NavItem>
+                  <NavItem href="#" icon={ShoppingBag}>
+                    Buy FIBO
+                  </NavItem>
+                  <NavItem href="#" icon={ScanBarcode}>
+                    Mint FIBO
                   </NavItem>
                 </div>
               </div>
@@ -111,22 +117,12 @@ export default function Sidebar() {
             <div className="flex justify-center space-x-4">
               <Link href="#">
                 <span className="text-gray-600 hover:text-color5 transition-colors">
-                  <FaFacebook size={20} />
-                </span>
-              </Link>
-              <Link href="#">
-                <span className="text-gray-600 hover:text-color5 transition-colors">
                   <FaTwitter size={20} />
                 </span>
               </Link>
               <Link href="#">
                 <span className="text-gray-600 hover:text-color5 transition-colors">
                   <FaLinkedin size={20} />
-                </span>
-              </Link>
-              <Link href="#">
-                <span className="text-gray-600 hover:text-color5 transition-colors">
-                  <FaInstagram size={20} />
                 </span>
               </Link>
             </div>

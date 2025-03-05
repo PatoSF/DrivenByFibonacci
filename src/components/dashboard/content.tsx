@@ -1,10 +1,12 @@
+import ListingTable from "./ListingTable";
 
 
 export default function Content() {
   return (
-    <div className="space-y-4 p-3 w-full overflow-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
+    <div className="space-y-4 p-4 w-full overflow-auto">
+      <div className="w-full flex flex-col gap-2">
+        <h1 className="text-color2 md:text-2xl text-3xl font-sora font-medium">Listings</h1>
+        <ListingTable />
       </div>
 
       {/* <div className="bg-white rounded-xl p-6 flex flex-col items-start justify-start border border-gray-200 ">
