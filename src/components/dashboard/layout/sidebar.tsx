@@ -3,11 +3,10 @@
 
 import {
   SidebarIcon,
-  BadgePlus,
-  BadgeMinus,
   ArrowRightLeft,
   ShoppingBag,
-  ScanBarcode
+  ScanBarcode,
+  ListStart
 } from "lucide-react";
 
 import { Home } from "lucide-react";
@@ -93,11 +92,8 @@ export default function Sidebar() {
                   <NavItem href="/dashboard" icon={Home}>
                     Dashboard
                   </NavItem>
-                  <NavItem href="#" icon={BadgePlus}>
-                    Add Listings
-                  </NavItem>
-                  <NavItem href="#" icon={BadgeMinus}>
-                    Remove Listings
+                  <NavItem href="/dashboard/listing" icon={ListStart}>
+                    Add/Remove Listings
                   </NavItem>
                   <NavItem href="/dashboard/swap" icon={ArrowRightLeft}>
                     Swap
