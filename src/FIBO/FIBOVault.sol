@@ -61,7 +61,7 @@ contract FiboVault is ERC4626 {
      * Sets the price, total supply of FIBO and the maximum number of substages in each stage
      * @param _maxsubstage The maximum number of substages per stage
      * @param _newprice The new price of FIBO
-     * @param _newsupply The new supply of FIBO before minting
+     * @param _newTotalSupply The new supply of FIBO before minting
      */
     function initializeStage(uint256 _maxsubstage, uint256 _newprice, uint256 _newTotalSupply) public {
         //Todo Add onlyRole(INITIALIZER_ROLE)

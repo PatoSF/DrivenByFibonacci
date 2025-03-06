@@ -115,8 +115,12 @@ contract Market {
     }
 
     /**
+<<<<<<< HEAD
      * @notice When a Token listing is canceled inside listings,
      *         the listing detailed all become zero
+=======
+     * @notice When a Token listing is canceled inside listings, the listing detailed all become zero
+>>>>>>> a849276fac66c699705e9e5d216fd2ef49b25454
      * @dev Remove a token from listings
      * @param listingId The Id of the listing
      */
@@ -150,25 +154,6 @@ contract Market {
                 priceFeedAddress: priceFeeds[i]
             });
         }
-        require(tokenSupportedByListing, "Token not supported by the listing");
-
-        uint256 amountOfDesiredTokensToBuyFIBO =
-            (_amount * getLatestPriceOfTokenInBaseToken(_desiredToken)) / Constants.DECIMAL_SCALING_FACTOR;
-
-        uint256 maxAmountOfDesiredTokensToTransfer =
-            (amountOfDesiredTokensToBuyFIBO * (100 + _slippagePercentage)) / 100;
-
-        // Ensure the user has approved enough tokens
-        require(
-            IERC20(_desiredToken).allowance(msg.sender, address(this)) >= maxAmountOfDesiredTokensToTransfer,
-            "Insufficient allowance, approve more tokens"
-        );
-
-        // TODO: Implement logic to increment the balance of tokenInSymbol (i.e., FIBO token)
-        // FIBOVault.balances[msg.sender] += _amount; // Not possible to change the value of a variable of another contract
-
-        // Transferring the slippage-adjusted amount of desiredTokens to the FIBO token lister from which the user is buying
-        IERC20(_desiredToken).transferFrom(msg.sender, listings[_listingId].holder, maxAmountOfDesiredTokensToTransfer);
     }
 
     /**
