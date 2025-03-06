@@ -6,18 +6,37 @@ pragma solidity ^0.8.27;
 */
 
 library DataTypes {
-
+    
     struct Stage {
-        uint256 TotalSubstages;  // Total number of substages
-        uint256 SubstageDuration;    // Duration in seconds
-        uint256 TotalPriceIncrease;  // Total price increase
-        uint256 TotalSupplyIncrease;  // Total supply increase
+        // Total Price Increase
+        uint256 price;
+        // Total Supply before minting
+        uint256 artificialSupply;
+        // Max Substages per Stage
+        uint256 maxSubstage;
+        // Substage Duration
+        uint256 substageDuration;
     }
 
     struct Substage {
-        uint SubstageNumber;
-        uint256 PriceIncrease;  // Price increase per substage
-        uint256 SupplyIncrease;  // Supply increase per substage
+        // Stage Number
+        uint256 stageId; 
+        // New Total Supply at the current Substage
+        uint256 newSubstageSupply;
+        // Substage Token Increase
+        uint256 substageTokenIncrease;
+        // Substage Price Increase
+        uint256 substagePrice;
+        // New Price after each substage
+        uint256 newPrice;
+    }
+    struct PreviousInfo {
+        // Previous Stage
+        uint256 previousStage;
+        // Previous Price
+        uint256 previousPrice;
+        // Previous Total Supply
+        uint256 previousTotalSupply;
     }
 
     struct TokenListing {
@@ -32,5 +51,10 @@ library DataTypes {
         Pending,
         Filled,
         Canceled
+    }
+
+    struct BaseToken {
+        bool listed;
+        address priceFeedAddress;
     }
 }

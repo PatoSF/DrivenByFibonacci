@@ -19,6 +19,19 @@ library Events {
         address indexed owner
     );
 
+    event TokensBought(
+        uint256 indexed listingId,
+        address indexed buyer,
+        uint256 receivedamount,
+        address desiredToken
+    );
+
+    event StageInitialized(
+        uint256 _stage, 
+        uint256 _maxsubstage, 
+        uint256 _newprice, 
+        uint256 _newsupply
+        );
 
 }
 
