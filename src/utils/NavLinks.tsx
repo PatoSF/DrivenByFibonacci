@@ -147,7 +147,7 @@ export const NavLinks: NavlinksType[] = [
       },
       {
         name: "Whitepapers",
-        href: "#",
+        href: "https://docs.google.com/document/d/11XsjGdmrqxMjpErNJZW_294E50i8PcIIcC3rN2Umn3M/edit?usp=sharing",
         description: "In-depth research",
         icon: <MdDescription className='w-5 h-5 lg:w-8 lg:h-8' />,
       },
