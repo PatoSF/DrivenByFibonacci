@@ -10,7 +10,7 @@ contract Euler is ERC20, Ownable {
 
 ///////////////////////////////////////////////////////// Minting & Burning ////////////////////////////////////////////////////////
 
-    function mint(uint256 _amount) internal onlyOwner() { 
+    function mint(uint256 _amount) public { 
         require(_amount > 0, InsufficientAmount(_amount));
         _mint(owner(), _amount);
     }

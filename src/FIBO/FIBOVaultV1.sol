@@ -17,7 +17,7 @@ import {Errors} from "../Libraries/Errors.sol";
 * @author Team EulerFi
 * @notice Standard ERC4626 vault with minting and burning capabilities
 */
-contract FiboVault is ERC4626 {
+contract FiboVault {
     IERC20 public Fibo;
     IERC20 public EuLer;
 
@@ -25,7 +25,8 @@ contract FiboVault is ERC4626 {
     uint256 private stage; 
     // Substage Number
     uint256 private substage;
-
+    // Current Price
+    uint256 private price;
     /**
      * @dev Tracks stage Information
      */
@@ -41,14 +42,10 @@ contract FiboVault is ERC4626 {
      */
     mapping (uint256 => mapping (uint256 => DataTypes.PreviousInfo)) public PreviousInfo;
 
-    constructor(IERC20 _asset,
-        IERC20 _Euler,
-        uint256 _maxsubstage, 
-        uint256 _newprice, 
-        uint256 _newsupply) ERC20("", "") ERC4626(_asset) { 
+    constructor(IERC20 _asset, IERC20 _Euler) { 
         Fibo = _asset;
         EuLer = _Euler;
-        initializeStage(_maxsubstage, _newprice, _newsupply);
+      
     }
 
     /////////////////////////////////////////////////// Setting Stage & Substage ///////////////////////////////////////////////////
@@ -63,22 +60,21 @@ contract FiboVault is ERC4626 {
      * @param _newprice The new price of FIBO
      * @param _newTotalSupply The new supply of FIBO before minting
      */
-    function initializeStage(uint256 _maxsubstage, uint256 _newprice, uint256 _newTotalSupply) public {
+    function initializeStage(uint256 _maxsubstage, uint256 _newprice, uint256 _newTotalSupply) public payable {
         //Todo Add onlyRole(INITIALIZER_ROLE)
         //Todo Add TimeLock | 365 days
         //Todo Restrict Executor access until DAO approval
         setStage();
         setMaxSubstage(_maxsubstage);
-        updateSubstage();
         setPrice(_newprice);
         setNewTokenSupply(_newTotalSupply);
-
+        
         CalculateSubstageDuration();
-        CalculateSubstagePrice();
-        CalculateSubtageTokenIncrease();
-
-        updatePrice();
-        updateTokenSupply();
+        // CalculateSubstagePrice();
+        // CalculateSubtageTokenIncrease();
+        updateSubstage();
+        // updatePrice();
+        // updateTokenSupply();
 
         emit Events.StageInitialized(stage, _maxsubstage, _newprice, _newTotalSupply);
     }
@@ -88,7 +84,7 @@ contract FiboVault is ERC4626 {
      * @dev Must be set before moving to the next stage
      * @return The current substage
      */
-    function updateSubstage() public returns (uint256) {
+    function updateSubstage() public payable returns (uint256) {
         //Todo Add onlyRole(EXECUTOR_ROLE)
         //Todo Add timelock | depending on substageDuration
         //Todo Restrict Executor access until DAO approval
@@ -96,6 +92,7 @@ contract FiboVault is ERC4626 {
         if (PreviousInfo[stage][substage].previousStage < stage) {   
             PreviousInfo[stage][substage].previousStage = stage;
             substage = 1;
+            PreviousInfo[stage][substage].previousPrice = StageInfo[stage-1].price;
         } else {
             substage += 1;
         }
@@ -113,8 +110,8 @@ contract FiboVault is ERC4626 {
      */
     function getUserTokens() public returns (uint256) {
         // Add timelock | depending on substageDuration | getUserTokens() can only be called once per substage
-        uint256 incrementInTotalSupply = totalSupply() - PreviousInfo[stage][substage].previousTotalSupply;
-        uint256 tokensToSend = ((balanceOf(msg.sender) * incrementInTotalSupply) * 1e18) / PreviousInfo[stage][substage].previousTotalSupply;
+        uint256 incrementInTotalSupply = Fibo.totalSupply() - PreviousInfo[stage][substage].previousTotalSupply;
+        uint256 tokensToSend = ((Fibo.balanceOf(msg.sender) * incrementInTotalSupply) * 1e18) / PreviousInfo[stage][substage].previousTotalSupply;
         FIBO(address(Fibo)).update(address(this), msg.sender, tokensToSend);
         return tokensToSend;
     }
@@ -126,7 +123,7 @@ contract FiboVault is ERC4626 {
      */
     function mintFIBO4Euler(uint256 _amount) public returns (uint256) {
         //Todo  Add timelock restriction so holder can swap their tokens at the beginning of each stage.
-        require(_amount > 0, "Amount to burn should be greater than 0");
+        require(_amount > 0, "Amount to burn should be greater than 00");
         //Todo we need to check the balance of the user Euler to make sure he has enough tokens
         Euler(address(EuLer)).burn(_amount);
         mint(_amount);
@@ -165,7 +162,7 @@ contract FiboVault is ERC4626 {
      */
     function setPrice(uint256 _price) internal returns (uint256) {
         require(_price > StageInfo[stage].price, "New price must be higher");
-        StageInfo[stage].price = _price;
+        StageInfo[stage].price = _price * 1e18;
         return StageInfo[stage].price;
     }
 
@@ -175,7 +172,7 @@ contract FiboVault is ERC4626 {
      * @param _newsupply The new supply
      */
     function setNewTokenSupply (uint256 _newsupply) internal returns (uint256) { 
-        require(_newsupply > totalSupply(), "Amount to mint should be greater than current supply");
+        require(_newsupply > StageInfo[stage].artificialSupply, "Amount to mint should be greater than current supply");
         StageInfo[stage].artificialSupply = _newsupply;
         return StageInfo[stage].artificialSupply;
     }
@@ -184,12 +181,13 @@ contract FiboVault is ERC4626 {
 
 ///////////////////////////////////////////////////////////////// Calculations /////////////////////////////////////////////////////////////////
 
-    function CalculateSubstagePrice() internal returns(uint256) {
-        SubstageInfo[stage][substage].substagePrice = ((StageInfo[stage].price - StageInfo[stage - 1].price) * 1e18) / substage;
+    function CalculateSubstagePrice() public returns(uint256) {
+        require(StageInfo[stage].price >= price, "Wrong Price");
+        SubstageInfo[stage][substage].substagePrice = (StageInfo[stage].price - PreviousInfo[stage][substage].previousPrice) / StageInfo[stage].maxSubstage;
         return SubstageInfo[stage][substage].substagePrice;
     }
     function CalculateSubtageTokenIncrease() internal returns(uint256) {
-        SubstageInfo[stage][substage].substageTokenIncrease = ((StageInfo[stage].artificialSupply - PreviousInfo[stage][substage].previousTotalSupply) * 1e18) / substage;
+        SubstageInfo[stage][substage].substageTokenIncrease = ((StageInfo[stage].artificialSupply - PreviousInfo[stage][substage].previousTotalSupply) * 1e18) / StageInfo[stage].maxSubstage;
         return SubstageInfo[stage][substage].substageTokenIncrease;
     }
 
@@ -204,12 +202,10 @@ contract FiboVault is ERC4626 {
      * @dev Updates the token price per substage
      */
     function updatePrice() internal returns (uint256) {
-        DataTypes.Substage storage substageInfo = SubstageInfo[stage][substage];
         SubstageInfo[stage][substage].substagePrice = CalculateSubstagePrice();
-       //SubstageInfo[stage][substage].newPrice += PreviousInfo[stage][substage].previousPrice;
-        PreviousInfo[stage][substage].previousPrice = SubstageInfo[stage][substage].newPrice;
-        SubstageInfo[stage][substage].newPrice += SubstageInfo[stage][substage].substagePrice;
-        return SubstageInfo[stage][substage].newPrice;
+        PreviousInfo[stage][substage].previousPrice = price;
+        price += SubstageInfo[stage][substage].substagePrice;
+        return price;
     }
 
     /**
@@ -220,10 +216,10 @@ contract FiboVault is ERC4626 {
         DataTypes.Substage storage substageInfo = SubstageInfo[stage][substage];
 
         SubstageInfo[stage][substage].substageTokenIncrease = CalculateSubtageTokenIncrease();
-        PreviousInfo[stage][substage].previousTotalSupply = totalSupply();
+        PreviousInfo[stage][substage].previousTotalSupply = Fibo.totalSupply();
         mint(SubstageInfo[stage][substage].substageTokenIncrease);
-        substageInfo.newSubstageSupply = totalSupply();
-        return totalSupply();
+        substageInfo.newSubstageSupply = Fibo.totalSupply();
+        return substageInfo.newSubstageSupply;
     }
 
     ////////////////////////////////////////////////////////////// Minting & Burning ///////////////////////////////////////////////////////////////
@@ -235,20 +231,20 @@ contract FiboVault is ERC4626 {
      */
     function mint(uint256 _amount) internal {
         require(_amount > 0, "Amount to burn should be greater than 0");
-        uint256 prevSup = totalAssets();
+        uint256 prevSup = Fibo.balanceOf(address(this));
         FIBO(address(Fibo)).mint(_amount);
-        require(totalAssets() > prevSup, "Minting failed: Supply did not increase");
+        require(Fibo.balanceOf(address(this)) > prevSup, "Minting failed: Supply did not increase");
     }
 
-    /**
-     * @dev Burns tokens, callable only by the protocol via MULTISIG_ROLE
-     * @param _amount The amount of tokens to be burned
-     */
-    function burn(uint256 _amount) public {
-        //Todo Add onlyRole(MULTISIG_ROLE)
-        require(_amount > 0, "Amount to burn should be greater than 0");
-        FIBO(address(Fibo)).burn(_amount);
-    }
+    // /**
+    //  * @dev Burns tokens, callable only by the protocol via MULTISIG_ROLE
+    //  * @param _amount The amount of tokens to be burned
+    //  */
+    // function burn(uint256 _amount) public {
+    //     //Todo Add onlyRole(MULTISIG_ROLE)
+    //     require(_amount > 0, "Amount to burn should be greater than 00");
+    //     FIBO(address(Fibo)).burn(_amount);
+    // }
 
     //////////////////////////////////////////////////////////////// Update Balance ////////////////////////////////////////////////////////////////
 
@@ -276,12 +272,14 @@ contract FiboVault is ERC4626 {
     function getSubstage() public view returns (uint256) {
         return substage;
     }
-    function getSubstagePrice(uint256 _stage, uint256 _substage) public view returns(uint256) {
-        return SubstageInfo[_stage][_substage].newPrice; 
+    function getPrice() public view returns(uint256) {
+        return price;
     }
-
-    function totalBalance () public view returns (uint256) {
-        return balanceOf(msg.sender) * SubstageInfo[stage][substage].newPrice;
+    function totalBalance() public view returns (uint256) {
+        return Fibo.balanceOf(msg.sender) * price;
+    }
+    function balance() public view returns (uint256) {
+        return Fibo.balanceOf(msg.sender);
     }
     
 }

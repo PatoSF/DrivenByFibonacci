@@ -8,7 +8,7 @@ import {DataTypes} from "../Libraries/DataTypes.sol";
 import {Events} from "../Libraries/Events.sol";
 import {Errors} from "../Libraries/Errors.sol";
 // import {IFIBOVault} from "../Interfaces/IFIBOVault.sol";
-import {FiboVault} from "./FIBOVault.sol";
+import {FiboVault} from "./FIBOVaultV1.sol";
 // interface IFIBOVault {
 //     function updateBalance(address _currentHolder, address _newHolder, uint256 _amount) public returns (uint256);
 // }
@@ -90,14 +90,14 @@ contract Market {
      */
     function listTokens(uint256 _amount, address[] memory _desiredTokens) public {
         require(_amount > 0, "Amount to list should be greater than 0");
-        require(FIBOVault.balanceOf(msg.sender) >= _amount, "Not enough balance");
+        require(FIBOVault.balance() >= _amount, "Not enough balance");
         /** @dev Checks if the amount of tokens that will be listed is smaller than 
                  the amount of tokens that are already being listed in respect to the user's balance*/
         uint256 listedBalance;
         for (uint256 i = 0; i < userListings[msg.sender].length; i++) {
             listedBalance += listings[userListings[msg.sender][i]].amount;
         }
-        uint256 availableTokens = FIBOVault.balanceOf(msg.sender) - listedBalance;
+        uint256 availableTokens = FIBOVault.Fibo().balanceOf(msg.sender) - listedBalance;
         require(_amount <= availableTokens, "Max tokens listed");
         /** @dev Checks if the token is supported by EulerFi */
         for (uint256 i = 0; i < _desiredTokens.length; i++) {
@@ -115,12 +115,7 @@ contract Market {
     }
 
     /**
-<<<<<<< HEAD
-     * @notice When a Token listing is canceled inside listings,
-     *         the listing detailed all become zero
-=======
      * @notice When a Token listing is canceled inside listings, the listing detailed all become zero
->>>>>>> a849276fac66c699705e9e5d216fd2ef49b25454
      * @dev Remove a token from listings
      * @param listingId The Id of the listing
      */
@@ -235,7 +230,7 @@ contract Market {
     function getLatestPriceOfTokenInBaseToken(uint256 tokenInAmount) public view returns (uint256) {
         uint256 stage = FIBOVault.getStage();
         uint256 substage = FIBOVault.getSubstage();
-        uint256 latestAmount = tokenInAmount * FIBOVault.getSubstagePrice(stage, substage);
+        uint256 latestAmount = tokenInAmount * FIBOVault.getPrice();
         return latestAmount;
     }
 
