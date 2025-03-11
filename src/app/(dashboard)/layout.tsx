@@ -2,6 +2,8 @@ import { AppKit } from "@/connection";
 import "@/styles/globals.css";
 import { getMetadata } from "@/utils/getMetadata";
 import type { ReactNode } from "react";
+import { Toaster } from "sonner";
+
 
 export const metadata = getMetadata({
   title: "EulerFi",
@@ -17,7 +19,10 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <AppKit>
-        <body className={`antialiased h-full bg-color1`}>{children}</body>
+        <body className={`antialiased h-full bg-color1`}>
+          {children}
+          <Toaster richColors position="top-right" />
+        </body>
       </AppKit>
     </html>
   );

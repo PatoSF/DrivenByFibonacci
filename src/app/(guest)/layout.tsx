@@ -3,6 +3,7 @@ import Nav from "@/components/shared/NavBar";
 import { getMetadata } from "@/utils/getMetadata";
 import MaxWrapper from "@/components/shared/MaxWrapper";
 import { Footer } from "@/components/shared/Footer";
+import { Toaster } from "sonner";
 
 export const metadata = getMetadata({
   title: "EulerFi",
@@ -25,6 +26,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <Toaster richColors position="top-right" />
         </MaxWrapper>
       </body>
     </html>
