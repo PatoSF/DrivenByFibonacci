@@ -2,6 +2,17 @@ import { useMemo } from "react";
 import useSignerOrProvider from "./useSignerOrProvider";
 import { Contract, InterfaceAbi } from "ethers";
 
+/**
+ * Hook to create an ethers Contract instance.
+ *
+ * If `withSigner` is true, the hook will return a Contract instance connected to the signer.
+ * Otherwise, it will return a Contract instance connected to a read-only provider.
+ *
+ * @param withSigner - Whether to connect the Contract instance to a signer. Defaults to false.
+ * @param contract_address - The address of the contract.
+ * @param abi - The ABI of the contract.
+ * @returns A Contract instance, or null if it cannot be created.
+ */
 const useContractInstance = (
   withSigner: boolean = false,
   contract_address: string,
