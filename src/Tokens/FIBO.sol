@@ -22,7 +22,7 @@ contract FIBO is ERC20, Ownable {
         _burn(owner(), _amount);
     }
 
-    function update(address from, address to, uint256 value) public onlyOwner(){
+    function update(address from, address to, uint256 value) public onlyOwner() {
         _update(from, to, value);    
     }
 

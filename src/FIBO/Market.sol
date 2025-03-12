@@ -59,7 +59,7 @@ contract Market {
         for (uint256 i = 0; i < listings[userListings[holder][_listingId]].desiredToken.length; i++) {
 
             if (listings[userListings[holder][_listingId]].desiredToken[i] == _desiredTokens) {
-                require(listings[userListings[holder][_listingId]].amount >= _amount, "Not enough balance");
+                //require(listings[userListings[holder][_listingId]].amount >= _amount, "Not enough balance");
                 listings[_listingId].amount -= _amount;
                 FIBOVault.updateBalance(listings[_listingId].holder, msg.sender, _amount);
                 uint256 receivedAmount = (getLatestPriceOfTokenInBaseToken(_exchangedAmount) * 1e18) / getConversionRate(_desiredTokens);
@@ -90,7 +90,7 @@ contract Market {
      */
     function listTokens(uint256 _amount, address[] memory _desiredTokens) public {
         require(_amount > 0, "Amount to list should be greater than 0");
-        require(FIBOVault.balance() >= _amount, "Not enough balance");
+        //require(FiboVault.balanceOf(msg.sender) >= _amount, "Not enough balance");
         /** @dev Checks if the amount of tokens that will be listed is smaller than 
                  the amount of tokens that are already being listed in respect to the user's balance*/
         uint256 listedBalance;
