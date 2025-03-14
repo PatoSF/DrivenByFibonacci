@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-
+import useMintFibo4Euler from "@/hooks/vault/useMintFibo4Euler";
+import useTokenBalance from "@/hooks/vault/useTokenBalance";
+import { EulerAddress } from "@/constant/contractAddresses";
 
 export default function Mint() {
   const [fromAmount, setFromAmount] = useState("");
-  const [toAmount, setToAmount] = useState("");
+  const [isMinting, setIsMinting] = useState(false);
+  const [balance, setBalance] = useState<string>("0");
 
   const handleFromValueChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -15,24 +18,53 @@ export default function Mint() {
     const value = event.target.value;
     if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
       setFromAmount(value);
-      setToAmount(value ? (Number(value) * 0.8).toString() : "");
     }
   };
 
-  const isSwapDisabled =
-    !fromAmount ||
-    !toAmount ||
-    Number(fromAmount) <= 0;
+  const mintFibo = useMintFibo4Euler();
+  const getTokenBalance = useTokenBalance(EulerAddress);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const userBalance = await getTokenBalance();
+        setBalance(userBalance);
+      } catch (error) {
+        console.error("Failed to fetch balance:", error);
+      }
+    };
+
+    fetchBalance();
+  }, [getTokenBalance]);
+
+  const handleMint = async () => {
+    if (!fromAmount) return;
+    setIsMinting(true);
+    try {
+      await mintFibo(Number(fromAmount));
+      // Refresh balance after successful minting
+      const updatedBalance = await getTokenBalance();
+      setBalance(updatedBalance);
+    } catch (error) {
+      console.error("Minting failed:", error);
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
+  // Disable the mint button if the inputs are invalid or if a transaction is in progress.
+  const isSwapDisabled = !fromAmount || Number(fromAmount) <= 0 || isMinting;
 
   return (
     <div className="mt-20 max-w-lg mx-auto">
-      <span className="text-2xl px-4 py-2">Mint</span>
+      <span className="text-2xl px-4 py-2 font-sora font-medium">Mint FIBO for EULER</span>
 
       <Card className="w-full mt-6 bg-color0 rounded-3xl">
         <CardContent className="p-3">
           <div className="rounded-2xl bg-color1 p-4 py-6 h-32 mb-2">
             <div className="flex justify-between mb-2">
               <label className="text-sm text-gray-600">Mint Amount</label>
+              <div className="text-sm text-gray-600"></div>
             </div>
             <div className="flex gap-2 items-center">
               <Input
@@ -59,12 +91,17 @@ export default function Mint() {
             </div>
           </div>
 
+          <span>
+            Euler Balance: <span className="font-semibold">{balance} EULER</span>{" "}
+          </span>
+
           <Button
             className="w-full bg-color5 mt-4 px-6 py-6 text-white text-lg hover:text-white rounded-full"
             size="lg"
             disabled={isSwapDisabled}
+            onClick={handleMint}
           >
-            {"Mint"}
+            {isMinting ? "Minting..." : "Mint"}
           </Button>
         </CardContent>
       </Card>

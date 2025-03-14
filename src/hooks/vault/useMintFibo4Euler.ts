@@ -1,9 +1,12 @@
-import { InterfaceAbi } from "ethers";
+import {ethers} from "ethers"
+
 import useContractInstance from "../setup/useContractInstance";
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { scroll, scrollSepolia } from "@reown/appkit/networks";
+import { scrollSepolia } from "@reown/appkit/networks";
+import { VaultAddress } from "@/constant/contractAddresses";
+import VaultABI from "@/constant/abis/VaultAbi.json";
 
 /**
  * Hook to mint FIBO for Euler
@@ -14,8 +17,8 @@ import { scroll, scrollSepolia } from "@reown/appkit/networks";
  *          returns a Promise that resolves to nothing if the mint was successful,
  *          or rejects with an error if the mint failed.
  */
-const useMintFibo4Euler = (contractAddress: string, ABI: InterfaceAbi) => {
-  const contract = useContractInstance(true, contractAddress, ABI);
+const useMintFibo4Euler = () => {
+  const contract = useContractInstance(true, VaultAddress, VaultABI);
   const { address } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
 
@@ -37,21 +40,20 @@ const useMintFibo4Euler = (contractAddress: string, ABI: InterfaceAbi) => {
       }
 
       if (
-        Number(chainId) !== Number(scrollSepolia.id) ||
-        Number(chainId) !== Number(scroll.id)
+        Number(chainId) !== Number(scrollSepolia.id)
       ) {
         toast.error("You're on the wrong network");
         return;
       }
 
       try {
-        const estimatedGas = await contract.mintFIBO4Euler.estimateGas(amount);
 
-        const tx = await contract.mintFIBO4Euler(amount, {
-          gasLimit: (estimatedGas * BigInt(120)) / BigInt(100),
-        });
+
+        const tx = await contract.mintFIBO4Euler(BigInt(amount*1e18));
 
         const receipt = await tx.wait();
+        console.log(receipt);
+        
 
         if (receipt.status === 1) {
           toast.success("Successfully minted FIBO for Euler");
