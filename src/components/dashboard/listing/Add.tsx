@@ -72,9 +72,10 @@ const Add = () => {
     try {
       const tokenAddresses = selectedTokens.map((token) => token.address);
       console.log(tokenAddresses);
-      
+
       await listTokens(amount, tokenAddresses);
     } catch (error) {
+      console.log(error);
       toast.error("Failed to list tokens.");
     }
   };

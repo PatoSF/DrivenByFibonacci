@@ -1,4 +1,5 @@
 import { JsonRpcProvider } from "ethers";
 
-// TODO: add RPC URL to .env
-export const readOnlyProvider = new JsonRpcProvider(process.env.RPC_URL);
+export const readOnlyProvider = new JsonRpcProvider(
+  process.env.NEXT_PUBLIC_RPC_URL
+);

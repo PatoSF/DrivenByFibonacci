@@ -6,7 +6,8 @@ import {
   ArrowRightLeft,
   ShoppingBag,
   ScanBarcode,
-  ListStart
+  ListStart,
+  ScaleIcon
 } from "lucide-react";
 
 import { Home } from "lucide-react";
@@ -103,6 +104,12 @@ export default function Sidebar() {
                   </NavItem>
                   <NavItem href="/dashboard/mint" icon={ScanBarcode}>
                     Mint FIBO
+                  </NavItem>
+                  <NavItem href="/dashboard/minteqbl" icon={ScaleIcon}>
+                    Mint EQBL
+                  </NavItem>
+                  <NavItem href="/dashboard/eqblinfo" icon={ScaleIcon}>
+                    EQBL Info
                   </NavItem>
                 </div>
               </div>

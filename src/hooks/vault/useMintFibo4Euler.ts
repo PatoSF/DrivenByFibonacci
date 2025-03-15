@@ -1,4 +1,4 @@
-import {ethers} from "ethers"
+
 
 import useContractInstance from "../setup/useContractInstance";
 import { useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";

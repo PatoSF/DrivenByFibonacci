@@ -22,6 +22,7 @@ const Remove = () => {
       await removeListing(id);
       setListingId("");
     } catch (error) {
+      console.log(error);
       toast.error("Failed to remove listing.");
     }
   };
