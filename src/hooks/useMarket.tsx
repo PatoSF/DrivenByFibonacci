@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { parseUnits } from "ethers";
 import useContractInstance from "./setup/useContractInstance";
 import { useAppKitAccount } from "@reown/appkit/react";
@@ -26,7 +27,7 @@ const useFiboMarket = () => {
         toast.success("Tokens listed successfully");
       } catch (error: any) {
         console.log(error);
-        
+
         toast.error(error.message || "Failed to list tokens");
       }
     },
@@ -45,7 +46,7 @@ const useFiboMarket = () => {
         toast.success("Listing removed successfully");
       } catch (error: any) {
         console.log(error);
-        
+
         toast.error(error.message || "Failed to remove listing");
       }
     },
@@ -78,7 +79,7 @@ const useFiboMarket = () => {
         toast.success("Tokens purchased successfully");
       } catch (error: any) {
         console.log(error);
-        
+
         toast.error(error.message || "Failed to buy tokens");
       }
     },
