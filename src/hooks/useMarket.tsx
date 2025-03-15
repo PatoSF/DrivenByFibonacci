@@ -25,6 +25,8 @@ const useFiboMarket = () => {
         await tx.wait();
         toast.success("Tokens listed successfully");
       } catch (error: any) {
+        console.log(error);
+        
         toast.error(error.message || "Failed to list tokens");
       }
     },

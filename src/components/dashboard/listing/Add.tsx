@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
 import {
@@ -10,92 +10,72 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import Image from "next/image";
-import { Minus, Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import useFiboMarket from "@/hooks/useMarket";
 import { toast } from "sonner";
-import { CardTitle } from "@/components/ui/card-hover-effect";
-import { bool } from "yup";
 
-// type Token = {
-//     name: string;
-//     symbol: string;
-//     address: string;
-//     image: string;
-// };
+type Token = {
+  name: string;
+  symbol: string;
+  address: string;
+  image: string;
+};
 
-// const tokens: Token[] = [
-//     {
-//         name: "Ethereum",
-//         symbol: "ETH",
-//         address: "0xEthereumAddress",
-//         image: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
-//     },
-//     {
-//         name: "USDC",
-//         symbol: "USDC",
-//         address: "0xUsdcAddress",
-//         image: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=013",
-//     },
-//     {
-//         name: "UniToken",
-//         symbol: "UNI",
-//         address: "0xUniAddress",
-//         image: "https://cryptologos.cc/logos/uniswap-uni-logo.png?v=013",
-//     },
-//     {
-//         name: "LINK",
-//         symbol: "LINK",
-//         address: "0xLinkAddress",
-//         image: "https://cryptologos.cc/logos/chainlink-link-logo.png?v=013",
-//     },
-// ];
+const tokens: Token[] = [
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    address: "0x5300000000000000000000000000000000000004",
+    image: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+  },
+  {
+    name: "USDC",
+    symbol: "USDC",
+    address: "0x690000EF01deCE82d837B5fAa2719AE47b156697",
+    image: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=013",
+  },
+  {
+    name: "DAI",
+    symbol: "DAI",
+    address: "0xFa94dA175bE505B915187EdC8aE2f62F4Ccbf848",
+    image: "https://cryptologos.cc/logos/dai-dai-logo.png?v=013",
+  },
+];
 
 const Add = () => {
   const [amount, setAmount] = useState<number | undefined>();
-  const [tokenAddresses, setTokenAddresses] = useState<string[]>([""]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTokens, setSelectedTokens] = useState<Token[]>([]);
   const { listTokens } = useFiboMarket();
 
-  const addTokenAddressField = () => {
-    setTokenAddresses([...tokenAddresses, ""]);
-  };
-
-  const removeTokenAddressField = (index: number) => {
-    if (tokenAddresses.length > 1) {
-      setTokenAddresses(tokenAddresses.filter((_, i) => i !== index));
+  const handleTokenSelect = (value: string) => {
+    const token = tokens.find((t) => t.symbol === value);
+    if (token && !selectedTokens.some((t) => t.symbol === token.symbol)) {
+      setSelectedTokens([...selectedTokens, token]);
     }
   };
 
-  const updateTokenAddress = (index: number, value: string) => {
-    const newAddresses = [...tokenAddresses];
-    newAddresses[index] = value;
-    setTokenAddresses(newAddresses);
+  const removeToken = (symbol: string) => {
+    setSelectedTokens((prev) => prev.filter((t) => t.symbol !== symbol));
   };
 
   const handleSubmit = async () => {
     if (!amount || amount <= 0) {
-      toast.error("Please enter a valid amount");
+      toast.error("Please enter a valid amount.");
       return;
     }
 
-    // Filter out empty addresses
-    const validAddresses = tokenAddresses.filter((addr) => addr.trim() !== "");
-
-    if (validAddresses.length === 0) {
-      toast.error("Please enter at least one token address");
+    if (selectedTokens.length === 0) {
+      toast.error("Please select at least one token.");
       return;
     }
 
-    setIsLoading(true);
     try {
-      await listTokens(amount, validAddresses).then(() => {
-        setAmount(undefined);
-        setTokenAddresses([""]);
-      });
-    } catch (error: any) {
-      toast.error(error.message || "Failed to list tokens");
-    } finally {
-      setIsLoading(false);
+      const tokenAddresses = selectedTokens.map((token) => token.address);
+      console.log(tokenAddresses);
+      
+      await listTokens(amount, tokenAddresses);
+    } catch (error) {
+      toast.error("Failed to list tokens.");
     }
   };
 
@@ -117,35 +97,65 @@ const Add = () => {
           </div>
 
           <div className="w-full mb-4">
-            <label className="text-sm text-color2 mb-1.5 block">Desired Token </label>
-            <div className="space-y-2">
-              {tokenAddresses.map((tokenAddress, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    placeholder="Token address (0x...)"
-                    value={tokenAddress}
-                    onChange={(e) => updateTokenAddress(index, e.target.value)}
-                    className="w-full h-[42px] border-0 bg-color1 text-color2 px-4 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeTokenAddressField(index)}
-                    disabled={tokenAddresses.length <= 1}
-                    className="h-5 w-5 bg-transparent text-red-500 rounded-full text-xs flex items-center justify-center disabled:opacity-50"
+            <label className="text-sm text-color2 mb-1.5 block">
+              Desired Tokens
+            </label>
+            <Select onValueChange={(value: string) => handleTokenSelect(value)}>
+              <SelectTrigger className="w-full h-[42px] flex flex-wrap items-center gap-2 pointer-events-auto">
+                {selectedTokens.length === 0 ? (
+                  <span className="text-gray-500">Select desired tokens</span>
+                ) : (
+                  <div className="flex items-center gap-4 pointer-events-auto">
+                    {selectedTokens.map((token, index) => (
+                      <div
+                        key={index}
+                        className="relative flex items-center p-1 bg-gray-100 rounded pointer-events-auto"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Image
+                          src={token.image}
+                          alt={`${token.symbol} logo`}
+                          width={20}
+                          height={20}
+                          className="w-6 h-6 rounded-full"
+                        />
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeToken(token.symbol);
+                          }}
+                          className="absolute -top-[2px] -right-[2px] bg-color5 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center pointer-events-auto"
+                        >
+                          <X className="w-3 h-3" />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SelectTrigger>
+              <SelectContent className="bg-white text-color2">
+                {tokens.map((token) => (
+                  <SelectItem
+                    key={token.symbol}
+                    value={token.symbol}
+                    className="cursor-pointer"
                   >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={addTokenAddressField}
-              className="mt-2 flex items-center gap-1 text-color2 border border-dashed border-color2 rounded-lg px-3 py-2 text-sm hover:bg-color1/50 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              Add Another Token Address
-            </button>
+                    <span className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-6 h-6 rounded-full">
+                        <Image
+                          src={token.image}
+                          alt={`${token.symbol} logo`}
+                          width={200}
+                          height={200}
+                          className="w-5 h-5 rounded-full"
+                        />
+                      </span>
+                      {token.symbol}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <Button
