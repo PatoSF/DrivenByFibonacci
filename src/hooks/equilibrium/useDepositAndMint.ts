@@ -6,6 +6,7 @@ import { scrollSepolia } from "@reown/appkit/networks";
 import { EquilibriumEngine } from "@/constant/contractAddresses";
 import { Contract } from "ethers";
 import useSignerOrProvider from "../setup/useSignerOrProvider";
+import EqblABI from "../../constant/abis/EquilibriumEngineAbi.json";
 
 type TokenType = {
   name: string;
@@ -36,22 +37,10 @@ const ERC20ApproveABI = [
     ],
     type: "function",
   },
-  {
-    constant: true,
-    inputs: [],
-    name: "decimals",
-    outputs: [
-      {
-        name: "",
-        type: "uint8",
-      },
-    ],
-    type: "function",
-  },
 ];
 
 const useDepositAndMint = () => {
-  const contract = useContractInstance(true, EquilibriumEngine, ABI);
+  const contract = useContractInstance(true, EquilibriumEngine, EqblABI);
   const { address } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
 
@@ -59,12 +48,8 @@ const useDepositAndMint = () => {
 
   return useCallback(
     async (token: TokenType, colAmount: number, amount: number) => {
-      if (colAmount < 1) {
-        toast.error("Amount is too small");
-        return;
-      }
       if (amount < 1) {
-        toast.error("Amount is too small");
+        toast.error(`Amount ${amount} is too small`);
         return;
       }
 
@@ -96,8 +81,10 @@ const useDepositAndMint = () => {
 
       try {
         //Retrieve token decimals
-        const decimals = await ERC20Contract.decimals();
-        const adjustedColAmount = BigInt(colAmount * 10 ** decimals);
+        const decimals = token.symbol === "USDC" ? 6 : 18; // Adjust based on token
+        const adjustedColAmount = BigInt(
+          Math.floor(colAmount * 10 ** decimals)
+        );
 
         // First approving the contract to spend the token
         const approveTx = await ERC20Contract.approve(

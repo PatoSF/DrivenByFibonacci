@@ -1,10 +1,11 @@
 'use client'
-import { Button } from "@/components/ui/button";
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import useGetAccountInfo from "@/hooks/equilibrium/useGetAccountInfo";
+import useGetUserCollateralBalance from "@/hooks/equilibrium/useGetUserCollateralBalance";
 import Image from "next/image";
 import { useState } from "react";
-import { toast } from "sonner";
 
 
 type Token = {
@@ -45,13 +46,9 @@ const AccountInfoAndBal = () => {
         }
     };
 
-    const handleSubmit = async () => {
-        if (!selectedToken) {
-            toast.error("Please select a token");
-            return;
-        }
-        // Implement logic to fetch and display balance for the selectedToken.address
-    };
+    const balance = useGetUserCollateralBalance(selectedToken?.address || "")
+
+    const { totalEqblMinted, collateralValue } = useGetAccountInfo()
 
     return (
         <section className="w-full py-20 md:py-28 md:px-10 px-4 grid md:grid-cols-2 md:gap-10 gap-8">
@@ -62,11 +59,11 @@ const AccountInfoAndBal = () => {
                     <CardContent className="p-6">
                         <p className="text-color2 flex items-center gap-2 text-sm font-sora mb-3 font-medium">
                             <strong>Total Equilibrium Minted:</strong>
-                            1276.00
+                            {totalEqblMinted}
                         </p>
                         <p className="text-color2 flex items-center gap-2 text-sm font-sora font-medium">
                             <strong>Collateral Value In USD:</strong>
-                            $1276.00
+                            ${collateralValue}
                         </p>
                     </CardContent>
                 </Card>
@@ -81,7 +78,7 @@ const AccountInfoAndBal = () => {
                     <CardContent className="p-6">
                         <p className="text-color2 flex items-center gap-2 font-sora mb-3 font-medium">
                             <strong>Your Collateral Balance:</strong>
-                            1276.00
+                            {balance}
                         </p>
                         <div className="w-full mb-4">
                             <label className="text-sm text-color2 mb-1.5 block">
@@ -115,13 +112,6 @@ const AccountInfoAndBal = () => {
                                 </SelectContent>
                             </Select>
                         </div>
-
-                        <Button
-                            onClick={handleSubmit}
-                            className="w-full bg-color5 mt-7 text-white text-base hover:text-white rounded-lg"
-                        >
-                            Get Balance
-                        </Button>
                     </CardContent>
                 </Card>
             </div>

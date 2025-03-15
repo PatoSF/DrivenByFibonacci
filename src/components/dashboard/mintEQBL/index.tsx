@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
+import useDepositAndMint from '@/hooks/equilibrium/useDepositAndMint';
 import Image from 'next/image';
 import React, { useState } from 'react'
 
@@ -46,8 +47,10 @@ const DepositAndMintEQBL = () => {
         }
     };
 
-    const handleMint = async () => {
+    const handleDepositAndMint = useDepositAndMint();
 
+    const handleMint = async () => {
+        await handleDepositAndMint(selectedToken!, Number(colAmount), Number(amount))
     }
 
     return (
