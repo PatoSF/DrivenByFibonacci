@@ -15,7 +15,7 @@ type TokenType = {
   image: string;
 };
 
-const ERC20ApproveABI = [
+export const ERC20ApproveABI = [
   {
     constant: false,
     inputs: [

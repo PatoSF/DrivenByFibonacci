@@ -1,16 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { parseUnits } from "ethers";
+import { Contract, parseUnits } from "ethers";
 import useContractInstance from "./setup/useContractInstance";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { MarketAdress } from "@/constant/contractAddresses";
 import MarketABI from "@/constant/abis/MarketAbi.json";
-
+import { ERC20ApproveABI } from "./equilibrium/useDepositCollateral";
+import useSignerOrProvider from "./setup/useSignerOrProvider";
 
 const useFiboMarket = () => {
   const contract = useContractInstance(true, MarketAdress, MarketABI);
   const { address } = useAppKitAccount();
+  const { signer } = useSignerOrProvider();
 
   const listTokens = useCallback(
     async (amount: number, desiredTokens: string[]) => {
@@ -55,25 +57,36 @@ const useFiboMarket = () => {
 
   const buyFIBO = useCallback(
     async (
-      holder: string,
       listingId: number,
       amount: number,
       exchangedAmount: number,
-      desiredTokens: string,
-      slippage: number
+      desiredTokens: string
     ) => {
       if (!contract || !address) {
         toast.error("Wallet not connected");
         return;
       }
+
+      const ERC20Contract = new Contract(
+        desiredTokens,
+        ERC20ApproveABI,
+        signer
+      );
+
       try {
+        // First approving the contract to spend the token
+        // const approveTx = await ERC20Contract.approve(MarketAdress,  parseUnits(amount.toString(), 18));
+        // await approveTx.wait();
+        console.log(address, listingId, desiredTokens, amount);
+
         const tx = await contract.BuyFIBO(
-          holder,
-          listingId,
-          parseUnits(amount.toString(), 18),
-          parseUnits(exchangedAmount.toString(), 18),
+          address,
+          BigInt(listingId),
+          amount,
+          // parseUnits(exchangedAmount.toString(), 18),
+          exchangedAmount,
           desiredTokens,
-          slippage
+          1
         );
         await tx.wait();
         toast.success("Tokens purchased successfully");
@@ -83,7 +96,7 @@ const useFiboMarket = () => {
         toast.error(error.message || "Failed to buy tokens");
       }
     },
-    [contract, address]
+    [signer]
   );
 
   return { listTokens, removeListing, buyFIBO };

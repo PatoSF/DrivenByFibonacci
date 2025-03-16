@@ -4,7 +4,7 @@ export const FIBOAddress = "0x4c43df039724e2320243453e92e33d16f30a5896";
 
 export const VaultAddress = "0xE8D363b1081c86379e8c86f662d6f249E49dC20c";
 
-export const MarketAdress = "0x364d3F80803dA4013bfadE4c4D7C1384850f1242";
+export const MarketAdress = "0x3473Fc796499233B4E7a776a974e2bAf7A8e532d";
 
 export const Equilibrium = "0x2Cb9F2F6e484C0313C53b11aA068e25f81bB9679";
 

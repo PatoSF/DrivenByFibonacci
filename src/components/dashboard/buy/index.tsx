@@ -1,131 +1,160 @@
-import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowDown } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
+"use client"
 
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
+import Image from "next/image"
+import { useState, useCallback } from "react"
+import { toast } from "sonner"
+import { parseUnits } from "ethers"
+import useFiboMarket from "@/hooks/useMarket";
+type TokenType = {
+  name: string
+  symbol: string
+  address: string
+  image: string
+}
 
-export default function Buy() {
-  const [fromAmount, setFromAmount] = useState("");
-  const [toAmount, setToAmount] = useState("");
+const tokens: TokenType[] = [
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    address: "0x5300000000000000000000000000000000000004",
+    image: "https://cryptologos.cc/logos/ethereum-eth-logo.png",
+  },
+  {
+    name: "USDC",
+    symbol: "USDC",
+    address: "0x690000EF01deCE82d837B5fAa2719AE47b156697",
+    image: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=013",
+  },
+  {
+    name: "DAI",
+    symbol: "DAI",
+    address: "0xFa94dA175bE505B915187EdC8aE2f62F4Ccbf848",
+    image: "https://cryptologos.cc/logos/dai-dai-logo.png?v=013",
+  },
+  {
+    name: "LINK",
+    symbol: "LINK",
+    address: "0x231d45b53C905c3d6201318156BDC725c9c3B9B1",
+    image: "https://cryptologos.cc/logos/chainlink-link-logo.png?v=013",
+  },
+]
 
-  const handleFromValueChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.value;
-    if (value === "" || (!isNaN(Number(value)) && Number(value) >= 0)) {
-      setFromAmount(value);
-      setToAmount(value ? (Number(value) * 0.8).toString() : "");
+const Buy = () => {
+  const [selectedToken, setSelectedToken] = useState<TokenType | null>(null)
+  const [amount, setAmount] = useState<number | string>("")
+  const [exchangedAmount, setExchangedAmount] = useState<number | string>("")
+  const [slippage, setSlippage] = useState<number>(1);
+  const [listingId, setListingId] = useState<number | string>("")
+
+  const {buyFIBO} = useFiboMarket(); 
+
+  const handleTokenSelect = (symbol: string) => {
+    const token = tokens.find((t) => t.symbol === symbol)
+    if (token) {
+      setSelectedToken(token)
     }
-  };
+  }
 
 
-  const isSwapDisabled =
-    !fromAmount ||
-    !toAmount ||
-    Number(fromAmount) <= 0;
+  const handleBuy = async () => {
+    if (!selectedToken) {
+      toast.error("Please select a token")
+      return
+    }
+
+    if (!amount || Number(amount) <= 0) {
+      toast.error("Please enter a valid amount")
+      return
+    }
+
+    await buyFIBO(Number(listingId), Number(amount), Number(exchangedAmount), selectedToken.address)
+  }
 
   return (
-    <div className="mt-20 max-w-lg mx-auto">
-      <span className="text-2xl px-4 py-2">Buy</span>
+    <div className="max-w-lg mx-auto mt-10">
+      <span className="text-xl px-4 py-2 font-sora font-medium">Buy FIBO</span>
 
-      <Card className="w-full mt-6 bg-color0 rounded-3xl">
-        <CardContent className="p-3">
-          <div className="rounded-2xl bg-color1 p-4 py-6 h-32 mb-2">
-            <div className="flex justify-between mb-2">
-              <label className="text-sm text-gray-600">You pay</label>
-            </div>
-            <div className="flex gap-2 items-center">
-              <Input
-                type="text"
-                placeholder="0.0"
-                value={fromAmount}
-                onChange={handleFromValueChange}
-                className="border-0 bg-transparent text-2xl focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
-              />
-
-              <div className="w-[150px] px-3 py-2 flex gap-5 items-center border-0 border-none rounded-full bg-color5 text-white">
-                <span className="flex items-center justify-center w-6 h-6 bg-color0 rounded-full">
-                  <Image
-                    src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=013"
-                    alt="USDC logo"
-                    width={200}
-                    height={200}
-                    className="w-5 h-5 rounded-full"
-                    onError={(e) => (e.currentTarget.style.display = "none")}
-                  />
-                
-                </span>
-                <span className="text-sm text-center">USDC</span>
-              </div>
-            </div>
+      <Card className="w-full mt-6 bg-color0 rounded-xl">
+        <CardContent className="p-6">
+          <div className="w-full mb-4">
+            <label className="text-sm text-color2 mb-1.5 block">Select Token</label>
+            <Select onValueChange={handleTokenSelect}>
+              <SelectTrigger className="w-full h-[42px] flex flex-wrap items-center gap-2 pointer-events-auto text-gray-500">
+                {selectedToken ? (
+                  <span className="text-gray-500">{selectedToken.symbol}</span>
+                ) : (
+                  <span className="text-gray-500">Select desired token</span>
+                )}
+              </SelectTrigger>
+              <SelectContent className="bg-white text-color2">
+                {tokens.map((token) => (
+                  <SelectItem key={token.name} value={token.symbol}>
+                    <span className="flex items-center gap-2">
+                      <span className="flex items-center justify-center w-6 h-6 bg-color0 rounded-full">
+                        <Image
+                          src={token?.image || "/placeholder.svg"}
+                          alt={`${token?.symbol} logo`}
+                          width={200}
+                          height={200}
+                          className="w-5 h-5 rounded-full"
+                        />
+                      </span>
+                      {token.symbol}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="relative h-0">
-            <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-              <Button
-                variant="secondary"
-                size="icon"
-                className="rounded-full shadow-md"
-              >
-                <ArrowDown className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="w-full mb-4">
+            <label className="text-sm text-color2 mb-1.5 block">Amount</label>
+            <Input
+              type="number"
+              placeholder="0.0"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+              className="w-full h-[42px] border-0 bg-color1 text-color2 text-xl px-4 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
           </div>
 
-          <div className="rounded-2xl bg-color1 p-4 py-6 h-32 mt-2">
-            <div className="flex justify-between mb-2">
-              <label className="text-base text-gray-600">You receive</label>
-            </div>
-            <div className="flex gap-2 items-center">
-              <Input
-                type="text"
-                placeholder="0.0"
-                value={toAmount}
-                readOnly
-                className="border-0 bg-transparent text-2xl focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
-              />
-             <div className="w-[150px] px-3 py-2 flex gap-5 items-center border-0 border-none rounded-full bg-color5 text-white">
-                <span className="flex items-center justify-center w-6 h-6 bg-color0 rounded-full">
-                  <Image
-                    src="/fibo-logo.png"
-                    alt="USDC logo"
-                    width={200}
-                    height={200}
-                    className="w-5 h-5 rounded-full"
-                    onError={(e) => (e.currentTarget.style.display = "none")}
-                  />
-                
-                </span>
-                <span className="text-sm text-center">FIBO</span>
-              </div>
-            </div>
+          <div className="w-full mb-4">
+            <label className="text-sm text-color2 mb-1.5 block">Expected FIBO Amount</label>
+            <Input
+              type="number"
+              placeholder="0.0"
+              value={exchangedAmount}
+              onChange={(e) => setExchangedAmount(Number(e.target.value))}
+              className="w-full h-[42px] border-0 bg-color1 text-color2 text-xl px-4 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
           </div>
 
-          <div className="mt-6 space-y-2 text-sm">
-            <br className="my-4" />
-            {fromAmount && toAmount && Number(fromAmount) > 0 && (
-              <div className="flex justify-between font-medium">
-                <span>Rate</span>
-                <span>
-                  1 {"USDC"} ={" "}
-                  {(Number(toAmount) / Number(fromAmount)).toFixed(6)}{" "}
-                  {"FIBO"}
-                </span>
-              </div>
-            )}
+          <div className="w-full mb-4">
+            <label className="text-sm text-color2 mb-1.5 block">Listing ID</label>
+            <Input
+              type="number"
+              placeholder=""
+              value={listingId}
+              onChange={(e) => setListingId(Number(e.target.value))}
+              className="w-full h-[42px] border-0 bg-color1 text-color2 text-xl px-4 focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
           </div>
 
           <Button
-            className="w-full bg-color5 mt-4 px-6 py-6 text-white text-lg hover:text-white rounded-full"
-            size="lg"
-            disabled={isSwapDisabled}
+            className="w-full bg-color5 mt-4 px-6 py-6 text-white text-base hover:text-white rounded-xl"
+            onClick={handleBuy}
           >
-            {"Buy"}
+            Buy FIBO
           </Button>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
+
+export default Buy
+
