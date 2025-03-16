@@ -34,6 +34,12 @@ const tokens: Token[] = [
         address: "0xFa94dA175bE505B915187EdC8aE2f62F4Ccbf848",
         image: "https://cryptologos.cc/logos/dai-dai-logo.png?v=013",
     },
+    {
+        name: "LINK",
+        symbol: "LINK",
+        address: "0x231d45b53C905c3d6201318156BDC725c9c3B9B1",
+        image: "https://cryptologos.cc/logos/chainlink-link-logo.png?v=013",
+    },
 ];
 
 const AccountInfoAndBal = () => {

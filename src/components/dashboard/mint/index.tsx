@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import useMintFibo4Euler from "@/hooks/vault/useMintFibo4Euler";
 import useTokenBalance from "@/hooks/vault/useTokenBalance";
-import { EulerAddress } from "@/constant/contractAddresses";
+import { EulerAddress, FIBOAddress } from "@/constant/contractAddresses";
 
 export default function Mint() {
   const [fromAmount, setFromAmount] = useState("");
   const [isMinting, setIsMinting] = useState(false);
   const [balance, setBalance] = useState<string>("0");
+  const [fiboBalance, setFiboBalance] = useState<string>("0");
+
 
   const handleFromValueChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -23,12 +25,15 @@ export default function Mint() {
 
   const mintFibo = useMintFibo4Euler();
   const getTokenBalance = useTokenBalance(EulerAddress);
+  const getFiboBalance = useTokenBalance(FIBOAddress);
 
   useEffect(() => {
     const fetchBalance = async () => {
       try {
         const userBalance = await getTokenBalance();
+        const FiboBalance = await getFiboBalance();
         setBalance(userBalance);
+        setFiboBalance(FiboBalance);
       } catch (error) {
         console.error("Failed to fetch balance:", error);
       }
@@ -43,8 +48,8 @@ export default function Mint() {
     try {
       await mintFibo(Number(fromAmount));
       // Refresh balance after successful minting
-      const updatedBalance = await getTokenBalance();
-      setBalance(updatedBalance);
+      const updatedBalance = await getFiboBalance();
+      setFiboBalance(updatedBalance);
     } catch (error) {
       console.error("Minting failed:", error);
     } finally {
@@ -91,8 +96,12 @@ export default function Mint() {
             </div>
           </div>
 
-          <span>
+          {/* <span>
             Euler Balance: <span className="font-semibold">{balance} EULER</span>{" "}
+          </span> */}
+
+          <span className="block mt-4">
+            Fibo Balance: <span className="font-semibold">{fiboBalance} FIBO</span>{" "}
           </span>
 
           <Button
