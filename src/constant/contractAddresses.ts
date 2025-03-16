@@ -9,3 +9,5 @@ export const MarketAdress = "0x3473Fc796499233B4E7a776a974e2bAf7A8e532d";
 export const Equilibrium = "0x2Cb9F2F6e484C0313C53b11aA068e25f81bB9679";
 
 export const EquilibriumEngine = "0xf117628F219BFf341E4468b82820dc8c9C978e3a";
+
+export const Multicall3 = "0xcA11bde05977b3631167028862bE2a173976CA11";

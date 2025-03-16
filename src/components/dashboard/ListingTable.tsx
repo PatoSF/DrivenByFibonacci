@@ -8,8 +8,12 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import Image from 'next/image';
+import useGetListings from '@/hooks/useGetListings';
 
 const ListingTable = () => {
+
+    const data = useGetListings();
+    console.log(data);
 
     const addressFormatter = (data: string) => {
         if (!data) return "";
