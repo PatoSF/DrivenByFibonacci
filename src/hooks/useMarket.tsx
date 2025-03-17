@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Contract, parseUnits } from "ethers";
 import useContractInstance from "./setup/useContractInstance";
@@ -96,7 +97,7 @@ const useFiboMarket = () => {
         toast.error(error.message || "Failed to buy tokens");
       }
     },
-    [signer]
+    [signer, contract, address]
   );
 
   return { listTokens, removeListing, buyFIBO };
