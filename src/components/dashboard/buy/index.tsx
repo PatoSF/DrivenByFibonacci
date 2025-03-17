@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -50,7 +51,7 @@ const Buy = () => {
   const [slippage, setSlippage] = useState<number>(1);
   const [listingId, setListingId] = useState<number | string>("")
 
-  const {buyFIBO} = useFiboMarket(); 
+  const { buyFIBO } = useFiboMarket();
 
   const handleTokenSelect = (symbol: string) => {
     const token = tokens.find((t) => t.symbol === symbol)

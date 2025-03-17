@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ export default function Mint() {
     };
 
     fetchBalance();
-  }, [getTokenBalance]);
+  }, [getTokenBalance, getFiboBalance]);
 
   const handleMint = async () => {
     if (!fromAmount) return;
